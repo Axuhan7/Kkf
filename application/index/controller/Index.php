@@ -6,6 +6,7 @@ namespace app\index\controller;
 use app\admin\model\RestSetting;
 use app\admin\model\WechatPlatform;
 use app\admin\model\WechatService;
+use app\common\lib\AppUserProfile;
 use app\common\lib\SinglePusher;
 use EasyWeChat\Factory;
 use think\Controller;
@@ -102,6 +103,16 @@ class Index extends Controller
         }else{
             session('from_url',isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'');
         }
+        // App 访问客服时同步邮箱/实名等资料，供后台访客信息展示
+        if (!empty($data['visiter_id'])) {
+            $profile = AppUserProfile::extractFromInput($data);
+            if (!empty($profile)) {
+                AppUserProfile::sync($data['business_id'], $data['visiter_id'], $profile, [
+                    'ip' => $this->request->ip(),
+                    'from_url' => 'index/home',
+                ]);
+            }
+        }
         $common = new Common();
         $newstr=$common->encrypt(http_build_query($data),'E',YMWL_SALT);
 
@@ -136,6 +147,15 @@ class Index extends Controller
         parse_str($data, $arr2);
         if (!isset($arr2['business_id'])) {
             $this->error('商户ID不存在');
+        }
+        if (!empty($arr2['visiter_id'])) {
+            $profile = AppUserProfile::extractFromInput($arr2);
+            if (!empty($profile)) {
+                AppUserProfile::sync($arr2['business_id'], $arr2['visiter_id'], $profile, [
+                    'ip' => $this->request->ip(),
+                    'from_url' => 'index/index',
+                ]);
+            }
         }
         $special = isset($arr2['special']) ? $arr2['special']:null;
         $theme=isset($arr2['theme'])?$arr2['theme']:'05202d';

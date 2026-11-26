@@ -4,6 +4,7 @@
 namespace app\mobile\controller;
 
 use app\admin\model\RestSetting;
+use app\common\lib\AppUserProfile;
 use app\common\lib\SinglePusher;
 use think\Controller;
 use app\Common;
@@ -49,6 +50,15 @@ class Index extends Controller
     {
 
         $data = $this->request->param();
+        if (!empty($data['business_id']) && !empty($data['visiter_id'])) {
+            $profile = AppUserProfile::extractFromInput($data);
+            if (!empty($profile)) {
+                AppUserProfile::sync($data['business_id'], $data['visiter_id'], $profile, [
+                    'ip' => $this->request->ip(),
+                    'from_url' => 'mobile/home',
+                ]);
+            }
+        }
         $common = new Common();
         $newstr=$common->encrypt(http_build_query($data),'E',YMWL_SALT);
         $this->redirect(BASEROOT.'/mobile/index?code=' . $newstr);
@@ -82,6 +92,15 @@ if(!isset($arr['code'])){
         }
 $code=$arr['code'];
         parse_str($data, $arr2);
+        if (!empty($arr2['business_id']) && !empty($arr2['visiter_id'])) {
+            $profile = AppUserProfile::extractFromInput($arr2);
+            if (!empty($profile)) {
+                AppUserProfile::sync($arr2['business_id'], $arr2['visiter_id'], $profile, [
+                    'ip' => $this->request->ip(),
+                    'from_url' => 'mobile/index',
+                ]);
+            }
+        }
         $setting = model("business")->field('domain_entry,domain_landing,chat_notice1,chat_notice2')->where('id', $arr2['business_id'])->find();
         if(!$setting){
             $this->error('当前商户坐席不存在', null,  '',999999999);

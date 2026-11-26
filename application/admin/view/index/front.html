@@ -9,6 +9,49 @@
                    
                 </div>
                 <br />
+
+                <div class="layui-card" style="margin-bottom:16px;border:1px solid #e8e8e8;">
+                    <div class="layui-card-header" style="font-weight:600;">App 用户资料同步接口（邮箱 / 实名信息）</div>
+                    <div class="layui-card-body" style="line-height:1.7;font-size:13px;color:#444;">
+                        <p>用户通过 App 访问客服时，把邮箱、实名等资料传进来，客服后台「客户咨询 → 访客信息」即可看到。</p>
+                        <p style="margin-top:8px;"><b>方式一：打开客服链接时带参数（H5 / App WebView）</b></p>
+                        <pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;white-space:pre-wrap;">{$action}/index/index/home?business_id={$login.business_id}&amp;visiter_id=APP用户ID&amp;visiter_name=昵称&amp;avatar=头像URL&amp;email=user@example.com&amp;real_name=真实姓名&amp;id_card=身份证号&amp;phone=手机号&amp;gender=男&amp;app_vip=黄金会员</pre>
+                        <p style="margin-top:8px;">或在嵌入 JS 前设置：</p>
+                        <pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;white-space:pre-wrap;">&lt;script&gt;
+var ymwl = {
+  visiter_id: '10086',
+  visiter_name: '张三',
+  avatar: 'https://example.com/a.png',
+  email: 'zhangsan@example.com',
+  real_name: '张三',
+  id_card: '110101199001011234',
+  phone: '13800138000',
+  gender: '男',
+  app_level: 'VIP'
+};
+&lt;/script&gt;</pre>
+                        <p style="margin-top:8px;"><b>方式二：服务端 API 同步（App 后端调用）</b></p>
+                        <pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;white-space:pre-wrap;">POST {$action}/api/user/sync
+Content-Type: application/json
+
+{
+  "business_id": {$login.business_id},
+  "visiter_id": "10086",
+  "timestamp": 1710000000,
+  "sign": "md5(business_id#visiter_id#timestamp#app_secret)",
+  "email": "zhangsan@example.com",
+  "real_name": "张三",
+  "id_card": "110101199001011234",
+  "phone": "13800138000",
+  "gender": "男",
+  "avatar": "https://example.com/a.png",
+  "extra": {"vip":"黄金","city":"上海"}
+}</pre>
+                        <p style="margin-top:8px;color:#666;">必须用 <b>POST</b>。签名：<code>sign = md5(business_id + '#' + visiter_id + '#' + timestamp + '#' + app_secret)</code>，timestamp 有效期 5 分钟。也可用请求头 <code>X-Api-Token</code>（环境变量 API_ACCESS_TOKEN）代替签名。</p>
+                        <p style="margin-top:6px;color:#666;">支持字段：email、real_name、id_card、phone/tel、gender、nickname、avatar、birthday、address、company、extra，以及任意 <code>app_*</code> 自定义字段。</p>
+                    </div>
+                </div>
+
                 <div class="contents">
                     聊天框样式：
                     <select name="type" id="type" onchange="swith()" style="margin-left:20px;padding: 3px;font-size: 14px;border-radius: 15px;border: 1px solid #e5e3e9;height: 32px;">
