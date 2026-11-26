@@ -78,6 +78,34 @@ function getstatus(visiter_id) {
                       str += data[2];
                       $(".iparea").text(str);
                   }
+                  // App 实名资料（api/user/sync 或 URL 参数写入 connect）
+                  var profile = {};
+                  if (res.data.connect) {
+                      try {
+                          profile = typeof res.data.connect === 'string' ? JSON.parse(res.data.connect) : res.data.connect;
+                      } catch (e) {
+                          profile = {};
+                      }
+                  }
+                  var hasProfile = profile && (profile.email || profile.real_name || profile.id_card || profile.phone || profile.tel || profile.gender || profile.extra);
+                  if (hasProfile) {
+                      $("#app-profile-box").show();
+                      $("#app_email").text(profile.email || '-');
+                      $("#app_real_name").text(profile.real_name || '-');
+                      $("#app_id_card").text(profile.id_card || '-');
+                      $("#app_phone").text(profile.phone || profile.tel || '-');
+                      $("#app_gender").text(profile.gender || '-');
+                      $("#app_synced_at").text(profile.synced_at || '-');
+                      if (profile.extra && typeof profile.extra === 'object' && Object.keys(profile.extra).length) {
+                          $("#app_extra_wrap").show();
+                          $("#app_extra").text(JSON.stringify(profile.extra, null, 2));
+                      } else {
+                          $("#app_extra_wrap").hide();
+                          $("#app_extra").text('');
+                      }
+                  } else {
+                      $("#app-profile-box").hide();
+                  }
                 }
             }
         }

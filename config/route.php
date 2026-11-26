@@ -9,6 +9,7 @@
 use think\Route;
 
 Route::get('api/group/:business_id', 'api/Group/getGroup');
+Route::rule('api/user/sync', 'api/User/sync');
 
 // 管理员IP白名单管理路由（下划线格式，匹配AJAX硬编码URL）
 Route::rule('platform/admin_ip/index', 'platform/AdminIp/index');
