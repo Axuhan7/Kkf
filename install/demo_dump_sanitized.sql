@@ -788,7 +788,7 @@ CREATE TABLE `wolive_storage` (
 
 LOCK TABLES `wolive_storage` WRITE;
 /*!40000 ALTER TABLE `wolive_storage` DISABLE KEYS */;
-INSERT INTO `wolive_storage` VALUES (1,1,2,'{\"bucket\":\"kf3\",\"domain\":\"https:\\/\\/oss-cn-shanghai.aliyuncs.com\",\"cname\":\"0\",\"access_key\":\"\",\"secret_key\":\"xXehhjuZrb8PmJAewzWof8maI66Gxq\"}',1);
+INSERT INTO `wolive_storage` VALUES (1,1,2,'{\"bucket\":\"kf3\",\"domain\":\"https:\\/\\/oss-cn-shanghai.aliyuncs.com\",\"cname\":\"0\",\"access_key\":\"\",\"secret_key\":\"\"}',1);
 /*!40000 ALTER TABLE `wolive_storage` ENABLE KEYS */;
 UNLOCK TABLES;
 
