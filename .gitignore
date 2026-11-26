@@ -1,0 +1,7 @@
+.env
+runtime/local_secrets.php
+runtime/cache/*
+runtime/temp/*
+runtime/log/*
+runtime/ai_lock/*
+!runtime/.gitkeep

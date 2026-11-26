@@ -1,0 +1,291 @@
+{include file="public/header"/}
+<script type="text/javascript" src='__libs__/echarts/echarts.min.js'></script>
+<style>
+    #container { padding-top: 20px; padding-bottom: 20px; }
+
+    /* KPI卡片 */
+    .kpi-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .kpi-box {
+        flex: 1; border-radius: 12px; padding: 18px 22px; color: #fff;
+        display: flex; align-items: center; gap: 16px;
+        position: relative; overflow: hidden;
+        transition: transform 0.25s, box-shadow 0.25s;
+        cursor: default;
+    }
+    .kpi-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .kpi-box::after {
+        content: ''; position: absolute; right: -12px; top: -12px;
+        width: 80px; height: 80px; border-radius: 50%;
+        background: rgba(255,255,255,0.12);
+    }
+    .kpi-box .k-icon {
+        width: 46px; height: 46px; border-radius: 12px;
+        background: rgba(255,255,255,0.22); display: flex;
+        align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .kpi-box .k-info { flex: 1; }
+    .kpi-box .k-label { font-size: 12px; opacity: 0.88; margin-bottom: 4px; }
+    .kpi-box .k-val { font-size: 28px; font-weight: 700; line-height: 1.2; }
+    .kpi-box .k-sub { font-size: 11px; opacity: 0.78; margin-top: 3px; }
+    .kpi-box .k-sub b { opacity: 1; font-weight: 600; }
+
+    .kpi-1 { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+    .kpi-2 { background: linear-gradient(135deg, #4834d4, #686de0); }
+    .kpi-3 { background: linear-gradient(135deg, #22a6b3, #7ed6df); }
+    .kpi-4 { background: linear-gradient(135deg, #f0932b, #f6e58d); }
+
+    /* 图表面板 */
+    .panel {
+        background: #fff; border-radius: 12px; padding: 18px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        display: flex; flex-direction: column;
+    }
+    .panel .p-title {
+        font-size: 15px; font-weight: 600; color: #333;
+        margin-bottom: 14px; padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .panel .p-title::before {
+        content: ''; width: 4px; height: 16px;
+        border-radius: 2px;
+    }
+    .panel .p-body { flex: 1; min-height: 0; position: relative; }
+
+    /* 两栏布局 */
+    .two-col { display: flex; gap: 16px; margin-bottom: 16px; }
+    .two-col .col-left { flex: 1; min-width: 0; }
+    .two-col .col-right { flex: 1; min-width: 0; }
+
+    /* Tab */
+    .mini-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .mini-tabs .mtb {
+        padding: 4px 18px; border-radius: 16px; font-size: 13px;
+        border: 1px solid #e0e0e0; background: #fff; color: #666;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .mini-tabs .mtb.active { background: #4834d4; color: #fff; border-color: #4834d4; }
+    .mini-tabs .mtb:hover:not(.active) { border-color: #4834d4; color: #4834d4; }
+
+    /* 回复率表格 */
+    .rate-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .rate-table th {
+        background: #fafafa; color: #888; font-weight: 500;
+        padding: 10px 14px; text-align: left; border-bottom: 2px solid #f0f0f0;
+    }
+    .rate-table td {
+        padding: 10px 14px; color: #555; border-bottom: 1px solid #f5f5f5;
+    }
+    .rate-table tr:hover td { background: #fafbff; }
+    .rate-table .rate-badge {
+        display: inline-block; padding: 2px 10px; border-radius: 10px;
+        font-size: 12px; font-weight: 600; color: #fff;
+    }
+</style>
+
+<div id="container">
+    <div class="layui-fluid">
+
+        <!-- KPI 卡片 -->
+        <div class="kpi-row">
+            <div class="kpi-box kpi-1">
+                <div class="k-icon"><i class="layui-icon">&#xe612;</i></div>
+                <div class="k-info">
+                    <div class="k-label">当前咨询用户数</div>
+                    <div class="k-val">{$talking}</div>
+                    {if condition="$admins['level']=='super_manager'"}
+                    <div class="k-sub">当前在线客服数 <b>{$services}</b> 人</div>
+                    {else}
+                    <div class="k-sub">当前在线用户数 <b>{$visiter_online}</b> 人</div>
+                    {/if}
+                </div>
+            </div>
+            <div class="kpi-box kpi-2">
+                <div class="k-icon"><i class="layui-icon">&#xe609;</i></div>
+                <div class="k-info">
+                    <div class="k-label">当前排队用户数</div>
+                    <div class="k-val">{$waiter}</div>
+                    <div class="k-sub">接待总用户数 <b>{$getinall}</b> 人</div>
+                </div>
+            </div>
+            <div class="kpi-box kpi-3">
+                <div class="k-icon"><i class="layui-icon">&#xe608;</i></div>
+                <div class="k-info">
+                    <div class="k-label">今日聊天消息数</div>
+                    <div class="k-val">{$nowchats}</div>
+                    <div class="k-sub">聊天消息总数 <b>{$chatsall}</b> 条</div>
+                </div>
+            </div>
+            <div class="kpi-box kpi-4">
+                <div class="k-icon"><i class="layui-icon">&#xe67b;</i></div>
+                <div class="k-info">
+                    <div class="k-label">今日评价用户数</div>
+                    <div class="k-val">{$nowcomments}</div>
+                    <div class="k-sub">总评价用户数 <b>{$allcomments}</b> 条</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 两栏：回复率 + 接待量 -->
+        <div class="two-col">
+            <div class="panel col-left">
+                <div class="p-title" style="color:#ff6b6b;"><span style="background:#ff6b6b;display:inline-block;width:4px;height:16px;border-radius:2px;margin-right:8px;"></span>客服回复速度统计（5分钟内回复）</div>
+                <div class="p-body">
+                    <table class="rate-table" id="rateTable">
+                        <thead>
+                            <tr><th>客服姓名</th><th>接待客户数</th><th>5分钟内回复数</th><th>回复率</th></tr>
+                        </thead>
+                        <tbody id="rateBody">
+                            <tr><td colspan="4" style="text-align:center;color:#bbb;">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="panel col-right">
+                <div class="p-title" style="color:#4834d4;"><span style="background:#4834d4;display:inline-block;width:4px;height:16px;border-radius:2px;margin-right:8px;"></span>客服接待客户量</div>
+                <div class="mini-tabs" id="custTabs">
+                    <div class="mtb active" data-p="today">今日</div>
+                    <div class="mtb" data-p="week">本周</div>
+                    <div class="mtb" data-p="month">本月</div>
+                </div>
+                <div class="p-body">
+                    <div id="custBarChart" style="width:100%;height:100%;min-height:280px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 趋势折线图 -->
+        <div class="panel" style="margin-bottom:0;">
+            <div class="p-title" style="color:#22a6b3;"><span style="background:#22a6b3;display:inline-block;width:4px;height:16px;border-radius:2px;margin-right:8px;"></span>今日客服服务数据趋势</div>
+            <div class="p-body">
+                <div id="lineChart" style="width:100%;height:380px;"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+var COLORS = ['#4834d4','#22a6b3','#f0932b','#686de0','#7ed6df','#ee5a24','#f6e58d','#ff6b6b'];
+var custData = { today:[], week:[], month:[] };
+var curPeriod = 'today';
+
+// === 趋势折线图 ===
+var lineChart = echarts.init(document.getElementById('lineChart'));
+lineChart.setOption({
+    tooltip: { trigger:'axis', backgroundColor:'rgba(0,0,0,0.75)', textStyle:{color:'#fff',fontSize:12}, borderColor:'transparent' },
+    legend: { data:['会话总量','接入会话总量'], bottom:0, textStyle:{color:'#888',fontSize:12}, itemWidth:16, itemHeight:10, itemGap:24 },
+    grid: { top:20, left:'3%', right:'4%', bottom:40, containLabel:true },
+    color: ['#ff5c5c','#05202d'],
+    xAxis: { type:'category', boundaryGap:false,
+        data:['08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00','00:00'],
+        axisLine:{lineStyle:{color:'#e8e8e8'}}, axisLabel:{color:'#999',fontSize:11}, axisTick:{show:false}
+    },
+    yAxis: { type:'value',
+        splitLine:{lineStyle:{color:'#f0f0f0',type:'dashed'}},
+        axisLabel:{color:'#999',fontSize:11}
+    },
+    series: [
+        { name:'会话总量', type:'line', smooth:true, symbol:'circle', symbolSize:6,
+          lineStyle:{width:2.5},
+          itemStyle:{color:'#ff5c5c',borderWidth:2,borderColor:'#fff'},
+          areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(255,92,92,0.22)'},{offset:1,color:'rgba(255,92,92,0.02)'}]) },
+          data:[{$chatsdata[0]},{$chatsdata[1]},{$chatsdata[2]},{$chatsdata[3]},{$chatsdata[4]},{$chatsdata[5]},{$chatsdata[6]},{$chatsdata[7]},{$chatsdata[8]}]
+        },
+        { name:'接入会话总量', type:'line', smooth:true, symbol:'circle', symbolSize:6,
+          lineStyle:{width:2.5},
+          itemStyle:{color:'#05202d',borderWidth:2,borderColor:'#fff'},
+          areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(5,32,45,0.18)'},{offset:1,color:'rgba(5,32,45,0.02)'}]) },
+          data:[{$getindata[0]},{$getindata[1]},{$getindata[2]},{$getindata[3]},{$getindata[4]},{$getindata[5]},{$getindata[6]},{$getindata[7]},{$getindata[8]}]
+        }
+    ]
+});
+
+// === 接待量柱状图 ===
+var custBarChart = echarts.init(document.getElementById('custBarChart'));
+
+function renderCustBar(p) {
+    var d = custData[p]||[];
+    var names=[], seriesData=[];
+    if(d.length){
+        d.forEach(function(item,i){
+            names.push(item.service_name);
+            var c = COLORS[i%COLORS.length];
+            seriesData.push({
+                value: item.customer_count,
+                itemStyle: { color: c }
+            });
+        });
+    } else { names=['暂无数据']; seriesData=[{value:0,itemStyle:{color:'#ddd'}}]; }
+
+    custBarChart.clear();
+    custBarChart.setOption({
+        color: COLORS,
+        tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, backgroundColor:'rgba(0,0,0,0.75)', textStyle:{color:'#fff',fontSize:12}, borderColor:'transparent' },
+        grid:{ top:10, left:'3%', right:'4%', bottom:10, containLabel:true },
+        xAxis:{ type:'category', data:names, axisLine:{lineStyle:{color:'#e8e8e8'}}, axisLabel:{textStyle:{color:'#111',fontSize:12,fontWeight:'bold'}}, axisTick:{show:false} },
+        yAxis:{ type:'value', splitLine:{lineStyle:{color:'#f0f0f0',type:'dashed'}}, axisLabel:{color:'#999',fontSize:11} },
+        series:[{ type:'bar', barWidth:'50%',
+            itemStyle:{ borderRadius:[6,6,0,0] },
+            emphasis:{ itemStyle:{ shadowBlur:10, shadowColor:'rgba(0,0,0,0.15)' } },
+            data: seriesData
+        }]
+    });
+}
+
+// 加载回复率
+$.ajax({ url:'/admin/index/responseRate', type:'GET', dataType:'json',
+    success: function(res) {
+        if(res.code===0 && res.data.length>0) {
+            var html='';
+            res.data.forEach(function(item,i){
+                var c = COLORS[i%COLORS.length];
+                var badgeColor = item.rate>=80?'#22a6b3':item.rate>=50?'#f0932b':'#ff6b6b';
+                html += '<tr>' +
+                    '<td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-right:8px;"></span>'+item.service_name+'</td>' +
+                    '<td>'+item.total_customers+'</td>' +
+                    '<td>'+item.within_5min+'</td>' +
+                    '<td><span class="rate-badge" style="background:'+badgeColor+'">'+item.rate+'%</span></td>' +
+                '</tr>';
+            });
+            $('#rateBody').html(html);
+        } else {
+            $('#rateBody').html('<tr><td colspan="4" style="text-align:center;color:#bbb;">暂无数据</td></tr>');
+        }
+    },
+    error: function(xhr){
+        console.error('responseRate error:', xhr.status, xhr.responseText);
+        $('#rateBody').html('<tr><td colspan="4" style="text-align:center;color:#ff6b6b;">加载失败</td></tr>');
+    }
+});
+
+// 加载接待客户量
+$.ajax({ url:'/admin/index/customerStats', type:'GET', dataType:'json',
+    success: function(res) {
+        if(res.code===0){
+            custData.today=res.data.today||[];
+            custData.week=res.data.week||[];
+            custData.month=res.data.month||[];
+            renderCustBar(curPeriod);
+        }
+    },
+    error: function(xhr){
+        console.error('customerStats error:', xhr.status, xhr.responseText);
+    }
+});
+
+// Tab切换
+$(document).on('click','#custTabs .mtb',function(){
+    $('#custTabs .mtb').removeClass('active');
+    $(this).addClass('active');
+    curPeriod=$(this).data('p');
+    renderCustBar(curPeriod);
+});
+
+window.addEventListener('resize',function(){ lineChart.resize(); custBarChart.resize(); });
+</script>
+
+{include file="public/footer"/}

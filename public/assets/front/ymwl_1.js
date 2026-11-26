@@ -1,3 +1,4 @@
+var __YMWL_HOST=(typeof location!=='undefined'&&location.origin)?location.origin:'';
 
              
              /**
@@ -10,7 +11,7 @@
             var link = document.createElement('link');
                 link.type='text/css';
                 link.rel = 'stylesheet';
-                link.href ='https://kf3.yanshi.fun/assets/css/index/ymwl_online.css';
+                link.href =__YMWL_HOST + '/assets/css/index/ymwl_online.css';
                 head.appendChild(link);
 
             var blzx ={
@@ -32,9 +33,9 @@
 
                  },
                  blank:function(groupid){
-                  var web =encodeURI('https://kf3.yanshi.fun/index/index/home?theme=6a59ff&visiter_id='+blzx.visiter_id+'&visiter_name='+blzx.visiter_name+'&avatar='+blzx.avatar+'&business_id=1&groupid='+groupid+'&product='+blzx.product);
+                  var web =encodeURI(__YMWL_HOST + '/index/index/home?theme=6a59ff&visiter_id='+blzx.visiter_id+'&visiter_name='+blzx.visiter_name+'&avatar='+blzx.avatar+'&business_id=1&groupid='+groupid+'&product='+blzx.product);
                       
-                  var moblieweb = encodeURI('https://kf3.yanshi.fun/mobile/index/home?theme=6a59ff&visiter_id='+blzx.visiter_id+'&visiter_name='+blzx.visiter_name+'&avatar='+blzx.avatar+'&business_id=1&groupid='+groupid+'&product='+blzx.product);
+                  var moblieweb = encodeURI(__YMWL_HOST + '/mobile/index/home?theme=6a59ff&visiter_id='+blzx.visiter_id+'&visiter_name='+blzx.visiter_name+'&avatar='+blzx.avatar+'&business_id=1&groupid='+groupid+'&product='+blzx.product);
 
                    if ((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) {
                      window.open(moblieweb); 

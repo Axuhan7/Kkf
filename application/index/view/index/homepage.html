@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能在线客服系统 | 专业全渠道客服解决方案</title>
+    <script src="__libs__/jquery/jquery.min.js?v=__lkversion__"></script>
+    <link href="__libs__/layer/admin/layui.css?v=__lkversion__" rel="stylesheet">
+    <script src="__libs__/layui/layui.js?v=__lkversion__"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #333;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .hero-section {
+            padding: 60px;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content h1 {
+            font-size: 52px;
+            font-weight: 800;
+            color: #1a1a1a;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+        .hero-content h1 span {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-content p {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 36px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fff;
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(99, 102, 241, 0.5);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            transform: translateY(-3px);
+        }
+        .hero-stats {
+            display: flex;
+            gap: 60px;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .hero-stat-item {
+            text-align: left;
+        }
+        .hero-stat-item .number {
+            font-size: 40px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .hero-stat-item .label {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        .features-section {
+            padding: 100px 60px;
+            background: #ffffff;
+        }
+        .section-title {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+        .section-title h2 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+        .section-title p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f5f9;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: #e2e8f0;
+        }
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        .feature-card .icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #f0f0ff 0%, #f5f3ff 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover .icon {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+        }
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        .feature-card p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+        .chat-section {
+            padding: 100px 60px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .chat-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .chat-wrapper iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            display: block;
+        }
+        .footer {
+            padding: 60px;
+            background: #0f172a;
+            color: #94a3b8;
+        }
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #1e293b;
+        }
+        .footer-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .footer-brand::before {
+            content: '';
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 10px;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .footer p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        .footer h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .footer ul {
+            list-style: none;
+        }
+        .footer li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+        .footer li:hover {
+            color: #fff;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 20px;
+            }
+            .hero-content h1 {
+                font-size: 32px;
+            }
+            .hero-content p {
+                font-size: 16px;
+            }
+            .hero-stats {
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+            .features-section, .chat-section {
+                padding: 60px 20px;
+            }
+            .chat-wrapper iframe {
+                height: 500px;
+            }
+            .footer {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1>智能在线客服系统<br><span>让沟通更高效</span></h1>
+            <p>专业的全渠道客服解决方案，支持多端同步、智能回复、实时监控等强大功能，助力企业提升服务效率与客户满意度。</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="scrollToChat()">
+                    <span>开始咨询</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                <a href="/admin/login/index" class="btn btn-secondary">
+                    <span>客服后台登录</span>
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat-item">
+                    <div class="number">10万+</div>
+                    <div class="label">日均服务用户</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="number">99.9%</div>
+                    <div class="label">系统稳定性</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="number">0.1秒</div>
+                    <div class="label">平均响应时间</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="number">500+</div>
+                    <div class="label">企业客户</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="features-section" id="features">
+        <div class="section-title">
+            <h2>核心功能</h2>
+            <p>全方位满足企业客服需求，打造极致客户服务体验</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon">💬</div>
+                <h3>多类型消息</h3>
+                <p>支持发送语音、视频、文件、图片、表情等多种消息类型，满足多样化沟通需求</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📱</div>
+                <h3>多端支持</h3>
+                <p>完美适配PC和移动端，支持手机提醒和弹窗推送，随时随地响应客户</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">👥</div>
+                <h3>用户管理</h3>
+                <p>精准识别在线状态，支持IP定位、输入预知、拉黑等功能</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🏢</div>
+                <h3>客服管理</h3>
+                <p>支持不限数量客服、分组管理、会话转接、快捷回复</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📊</div>
+                <h3>数据分析</h3>
+                <p>实时统计咨询数据、服务评价、消息趋势等关键指标</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔔</div>
+                <h3>离线留言</h3>
+                <p>用户离线时客服可预留消息，用户上线后即可查看</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📢</div>
+                <h3>公告轮播</h3>
+                <p>支持聊天页面公告轮播展示，支持HTML超链接代码</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h3>一键群发</h3>
+                <p>支持向关注用户批量发送消息通知，高效触达目标用户</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-section" id="chatSection">
+        <div class="chat-wrapper">
+            <iframe id="chatFrame" 
+                    src="{:url('index/home', ['business_id'=>1, 'groupid'=>0, 'special'=>1, 'theme'=>'6a59ff'])}" 
+                    frameborder="0" 
+                    scrolling="auto"
+                    allow="microphone; camera">
+            </iframe>
+        </div>
+    </div>
+
+    <div class="footer" id="contact">
+        <div class="footer-content">
+        <div class="footer-bottom">
+            <p>© 2026 智能客服系统 - 专业的全渠道客服解决方案</p>
+        </div>
+    </div>
+
+    <script>
+        function scrollToChat() {
+            document.getElementById('chatSection').scrollIntoView({behavior: 'smooth'});
+        }
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        }
+    </script>
+    <script>
+
+function kf_getPopupDivHtml(kfguin,reference,companyname,welcomeword)
+
+  {
+
+    var temp = '';
+
+    temp += '<div style="-moz-user-select:none; -webkit-user-select:none; user-select:none;  float: left;height: 150px;position:relative;width: 8px;background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/bg_1.png);"></div>';
+
+    temp += '<div style="-moz-user-select:none; -webkit-user-select:none; user-select:none; font-family: Tahoma; text-align:left;float: left;height: 150px;width: 324px;background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/bg_2.gif);background-repeat: repeat-x;">';
+
+    temp += '<div><h1 style="-moz-user-select:none; -webkit-user-select:none; user-select:none; float:left;font-size: 16px;color: #FFFFFF;margin: 0px;padding: 6px 0 13px 2px;line-height:17px;">'+companyname+'</h1><a href="#" onclick="kf_hidekfpopup();return false;" style="-moz-user-select:none; -webkit-user-select:none; user-select:none; background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/close.gif);float: right;height: 19px;width: 42px;" onmouseover="javascript:this.style.backgroundPosition=\'bottom\'" onmouseleave="javascript:this.style.backgroundPosition=\'top\'"></a></div>';
+
+    temp += '<div style="-moz-user-select:none; -webkit-user-select:none; user-select:none; height:83px;padding: 0 0 0 2px;clear:both;">';
+
+    temp += '<div style="-moz-user-select:none; -webkit-user-select:none; user-select:none; border-radius:10px; background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/kf74.png); background-size:100% 100%; width:74px; height: 74px;float:left;"></div>';
+
+    temp += '<b style="-moz-user-select:none; -webkit-user-select:none; user-select:none; font-family:Tahoma;font-size:14px;line-height:24px;width: 220px;margin:0px;padding: 0 0 0 12px;display:block;float:left;margin-top:2px;word-wrap:break-word;">'+welcomeword+'</b></div>';
+
+    temp += '<div style="clear: both;">';
+
+    temp += '<a onclick="kf_hidekfpopup();return false;" href="#" style="-moz-user-select:none; -webkit-user-select:none; user-select:none; float:right;background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/btn_1.gif);margin: 5px 0 0 5px;padding: 0px;border:0px;height: 21px;width: 69px;"></a>';
+
+    temp += '<a href="javascript:;" onclick="blzx.connenct(0)" style="-moz-user-select:none; -webkit-user-select:none; user-select:none; float:right;background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/btn_2.gif);margin: 5px 0 0 0;padding: 0px;border:0px;height: 21px;width: 69px;"></a></div>';
+
+    temp += '</div><div style="-moz-user-select:none; -webkit-user-select:none; user-select:none; float: left;height: 150px;width: 8px;background-image: url(https://kf3.yanshi.fun/zxkf/kfbl/kfimages/bg_1.png);background-position: right;"></div>';
+
+    return temp;
+
+  }
+
+</script>
+
+
+<script type="text/javascript">
+
+var head = document.getElementsByTagName('head')[0];
+
+var link = document.createElement('link');
+
+    link.type='text/css';
+
+    link.rel = 'stylesheet';
+
+    link.href ='https://kf3.yanshi.fun/assets/css/index/ymwl_online.css';
+
+    head.appendChild(link);
+
+var script = document.createElement('script');
+
+    script.type='text/javascript';
+
+    script.src ='https://kf3.yanshi.fun/assets/js/js.cookie.min.js';
+
+    head.appendChild(script); 
+
+     var blzx={};
+
+window.addEventListener('load', function(){
+
+blzx ={
+
+    visiter_id:(typeof ymwl=='undefined' || typeof ymwl.visiter_id == 'undefined')?'':ymwl.visiter_id,
+
+     visiter_name:(typeof ymwl=='undefined' || typeof ymwl.visiter_name == 'undefined')?'':ymwl.visiter_name,
+
+     avatar:(typeof ymwl=='undefined' || typeof ymwl.avatar == 'undefined')?'':ymwl.avatar,
+
+     product:(typeof ymwl=='undefined' || typeof ymwl.product == 'undefined')?'{}':ymwl.product,
+
+     open:function(){
+
+        var d =document.getElementById('wolive-box');
+
+        if(!d){
+
+            var div =document.createElement('div');
+
+            div.id ="ymwl-kefu";
+
+            div.className +='ymwl-form';
+
+            div.style.backgroundColor='#05202d'
+        }
+
+     },
+
+     connenct:function(groupid){
+
+      var id =groupid;
+
+      var web =encodeURI('https://kf3.yanshi.fun/layer?theme=05202d&visiter_id='+blzx.visiter_id+'&visiter_name='+blzx.visiter_name+'&avatar='+blzx.avatar+'&business_id=1&groupid='+groupid+'&product='+blzx.product);
+
+      var moblieweb = encodeURI('https://kf3.yanshi.fun/mobile/index/home?theme=05202d&visiter_id='+blzx.visiter_id+'&visiter_name='+blzx.visiter_name+'&avatar='+blzx.avatar+'&business_id=1&groupid='+groupid+'&product='+blzx.product);
+
+       var s =document.getElementById('wolive-talk');
+
+       if(!s){
+
+
+            var div = document.createElement('div');
+
+            div.id ="wolive-talk";
+
+            div.name=id;
+
+            if(blzx.isMobile()){
+
+               div.style.width='100%';
+
+               div.style.bottom=0;
+
+               div.style.right=0;
+
+               div.style.left=0;
+
+               div.style.height='500px'; /*弹出的高度*/
+
+           }
+
+            div.style.backgroundColor='#05202d'
+
+            document.body.appendChild(div);
+
+            div.innerHTML='<i class="ymwl-close" onclick="blzx.narrow()"></i><iframe id="wolive-iframe" src="'+web+'"></iframe>';
+
+        }else{
+
+            var title =s.name;
+
+            if(title == groupid){
+
+                s.style.display ='block';
+
+            }else{
+
+                s.parentNode.removeChild(s);
+
+                blzx.connenct(groupid); 
+
+            }
+
+        }
+
+     },
+
+     narrow:function(){
+
+        document.getElementById('wolive-talk').style.display="none";
+
+     },isMobile:function(){
+
+        if ((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) {
+
+            return true;
+
+        }else{
+
+            return false;
+
+        }
+
+    }
+
+}
+
+blzx.open();
+
+});
+
+</script>
+
+
+<script type=text/javascript>      
+
+     kfguin="3";
+
+     ws="";
+
+     companyname="在线客服";
+
+     welcomeword="您好,欢迎光临演示站<brT>请问,有什么可以帮到您的吗?"; type="1";
+
+</script>
+<script src="https://kf3.yanshi.fun/assets/front/ymwl_1.js?v=1781242631" charset="UTF-8"></script>
+<script type="text/javascript" src="https://kf3.yanshi.fun/zxkf/kfbl/js/kf.js"></script>
+</body>
+</html>

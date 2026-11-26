@@ -1,0 +1,134 @@
+<style>
+    .log-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .log-table th, .log-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e5e3e9;
+        font-size: 13px;
+    }
+    .log-table th {
+        background-color: #f7f7f7;
+        font-weight: 600;
+        color: #555;
+    }
+    .log-table tr:hover {
+        background-color: #f9f9f9;
+    }
+    .ip-text {
+        font-family: 'Consolas', 'Monaco', monospace;
+        color: #c62828;
+    }
+    .module-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        background-color: #fff3e0;
+        color: #e65100;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .page-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+    .btn-clear {
+        padding: 8px 20px;
+        background-color: #c62828;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .btn-clear:hover {
+        background-color: #b71c1c;
+    }
+    .btn-back {
+        padding: 8px 20px;
+        background-color: #f7f7f7;
+        color: #666;
+        border: 1px solid #e5e3e9;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-left: 12px;
+    }
+    .empty-tip {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+</style>
+
+<div class="page-header">
+    <div class="page-title">IP访问日志</div>
+    <div>
+        <button class="btn-clear" onclick="clearLog()">清空日志</button>
+        <a href="{:url('adminIp/index')}" class="btn-back">返回IP管理</a>
+    </div>
+</div>
+
+<div class="card-body">
+    {if condition="$list"}
+    <table class="log-table">
+        <thead>
+            <tr>
+                <th style="width: 60px;">ID</th>
+                <th>访问者IP</th>
+                <th>访问URL</th>
+                <th style="width: 100px;">模块</th>
+                <th style="width: 160px;">访问时间</th>
+            </tr>
+        </thead>
+        <tbody>
+            {volist name="list" id="vo"}
+            <tr>
+                <td>{$vo.id}</td>
+                <td><span class="ip-text">{$vo.ip}</span></td>
+                <td title="{$vo.url}">{$vo.url|substr=0,80}...</td>
+                <td><span class="module-badge">{$vo.module}</span></td>
+                <td>{$vo.createtime|date='Y-m-d H:i:s',###}</td>
+            </tr>
+            {/volist}
+        </tbody>
+    </table>
+    {else/}
+    <div class="empty-tip">
+        <p>暂无访问日志记录</p>
+    </div>
+    {/if}
+</div>
+
+<script>
+function clearLog() {
+    if (!confirm('确定要清空所有访问日志吗？')) return;
+
+    $.ajax({
+        url: "/platform/admin_ip/clearLog",
+        type: 'post',
+        data: {},
+        dataType: 'json',
+        success: function(res) {
+            if (res.code == 0) {
+                $.myToast({ content: res.msg });
+                setTimeout(function() { location.reload(); }, 1000);
+            } else {
+                $.myAlert({ content: res.msg || '操作失败' });
+            }
+        },
+        error: function() {
+            $.myAlert({ content: '网络错误，请重试' });
+        }
+    });
+}
+</script>

@@ -1,0 +1,672 @@
+{include file="public/header"/}
+<style>
+    .ai-panel {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .ai-panel-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+    .ai-panel-body {
+        padding: 20px;
+    }
+    .form-row {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+    }
+    .form-col {
+        flex: 1;
+        min-width: 0;
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+        text-align: left;
+        width: 100%;
+    }
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+        height: 42px;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #6366f1;
+    }
+    .btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .btn-default {
+        background: #f5f5f5;
+        color: #666;
+    }
+    .btn-default:hover {
+        background: #e8e8e8;
+    }
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table th, .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .table th {
+        background: #fafafa;
+        font-weight: 600;
+        color: #333;
+    }
+    .table td {
+        color: #666;
+    }
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .status-active {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    .status-inactive {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+    .ai-switch {
+        width: 52px;
+        height: 28px;
+        background: #d9d9d9;
+        border-radius: 14px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.3s;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .ai-switch.on {
+        background: #10b981;
+    }
+    .ai-switch::after {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background: #fff;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        transition: left 0.3s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .ai-switch.on::after {
+        left: 26px;
+    }
+</style>
+<div id="container" style="overflow-y: auto">
+    <div class="ai-panel">
+        <div class="ai-panel-header">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 7px; margin-right: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="7" width="18" height="13" rx="3" stroke="white" stroke-width="2" fill="none"/>
+                    <circle cx="9" cy="12" r="1.5" fill="white"/>
+                    <circle cx="15" cy="12" r="1.5" fill="white"/>
+                    <path d="M9 16 Q12 18 15 16" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                    <path d="M12 3 L12 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="2.5" r="1" fill="white"/>
+                </svg>
+            </span>
+            AI客服设置
+        </div>
+        <div class="ai-panel-body">
+            <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-col">
+                    <label class="form-label">AI客服开关</label>
+                    <div style="display: flex; align-items: center;">
+                        <div class="ai-switch" id="aiServiceState" data-value="{$business['ai_service_state']}" onclick="toggleAiSwitch(this)"></div>
+                        <span id="aiServiceText" style="margin-left: 10px; font-size: 14px;">{$business['ai_service_state'] == 'open' ? '开启' : '关闭'}</span>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <label class="form-label">回复优先级</label>
+                    <select class="form-control" id="aiPriority">
+                        <option value="human_first" {$business['ai_priority'] == 'human_first' ? 'selected' : ''}>人工优先</option>
+                        <option value="ai_first" {$business['ai_priority'] == 'ai_first' ? 'selected' : ''}>AI优先</option>
+                    </select>
+                </div>
+                <div class="form-col">
+                    <label class="form-label">自动回复延迟(秒)</label>
+                    <input type="number" class="form-control" id="aiDelay" value="{$business['ai_auto_reply_delay']}" min="0" max="60">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveBusinessSetting()">保存设置</button>
+        </div>
+    </div>
+
+    <div class="ai-panel">
+        <div class="ai-panel-header">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 7px; margin-right: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8 2 5 4 5 7C5 8 5.5 9 6 9.5C5.5 10 5 11 5 12C5 13 5.5 14 6 14.5C5.5 15 5 16 5 17C5 20 8 22 12 22C16 22 19 20 19 17C19 16 18.5 15 18 14.5C18.5 14 19 13 19 12C19 11 18.5 10 18 9.5C18.5 9 19 8 19 7C19 4 16 2 12 2Z" stroke="white" stroke-width="1.5" fill="none"/>
+                    <circle cx="10" cy="11" r="1" fill="white"/>
+                    <circle cx="14" cy="11" r="1" fill="white"/>
+                    <path d="M10 14 Q12 16 14 14" stroke="white" stroke-width="1" stroke-linecap="round" fill="none"/>
+                </svg>
+            </span>
+            大模型配置
+            <button class="btn btn-primary btn-sm" style="margin-left: auto; margin-right: 0;" onclick="openModelModal()">添加模型</button>
+        </div>
+        <div class="ai-panel-body">
+            {if empty($aiConfigs)}
+            <div style="text-align: center; padding: 40px; color: #999;">
+                暂无模型配置，请点击右上角添加
+            </div>
+            {else}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>模型名称</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>默认</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $aiConfigs as $config}
+                    <tr>
+                        <td>{$config['model_name']}</td>
+                        <td>{$modelTypes[$config['model_type']]}</td>
+                        <td>
+                            <span class="status-badge {$config['is_active'] == 1 ? 'status-active' : 'status-inactive'}">
+                                {$config['is_active'] == 1 ? '启用' : '禁用'}
+                            </span>
+                        </td>
+                        <td>{$config['is_default'] == 1 ? '是' : '否'}</td>
+                        <td>
+                            <button class="btn btn-default btn-sm" onclick="editModel({$config['id']})">编辑</button>
+                            <button class="btn btn-default btn-sm" onclick="testModel({$config['id']})">测试</button>
+                            <button class="btn btn-default btn-sm" onclick="deleteModel({$config['id']})">删除</button>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+            {/if}
+        </div>
+    </div>
+
+    <div class="ai-panel">
+        <div class="ai-panel-header">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 7px; margin-right: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H14C16 4 17 5 17 7V20L13 17H4V4Z" stroke="white" stroke-width="1.5" fill="none"/>
+                    <path d="M7 8H13" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M7 11H12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            知识库管理（训练数据）
+            <button class="btn btn-primary btn-sm" style="margin-left: auto; margin-right: 0;" onclick="openTrainingModal()">添加数据</button>
+        </div>
+        <div class="ai-panel-body">
+            {if empty($aiTrainings)}
+            <div style="text-align: center; padding: 40px; color: #999;">
+                暂无训练数据，请点击右上角添加产品参数、话术等
+            </div>
+            {else}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>类型</th>
+                        <th>内容预览</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $aiTrainings as $training}
+                    <tr>
+                        <td>{$training['title']}</td>
+                        <td>{$trainingTypes[$training['type']]}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{$training['content']}</td>
+                        <td>
+                            <span class="status-badge {$training['is_enabled'] == 1 ? 'status-active' : 'status-inactive'}">
+                                {$training['is_enabled'] == 1 ? '启用' : '禁用'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-default btn-sm" onclick="editTraining({$training['id']})">编辑</button>
+                            <button class="btn btn-default btn-sm" onclick="toggleTraining({$training['id']})">{$training['is_enabled'] == 1 ? '禁用' : '启用'}</button>
+                            <button class="btn btn-default btn-sm" onclick="deleteTraining({$training['id']})">删除</button>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+            {/if}
+        </div>
+    </div>
+</div>
+
+<script>
+var modelTypes = {:json_encode($modelTypes)};
+var trainingTypes = {:json_encode($trainingTypes)};
+
+function toggleAiSwitch(el) {
+    el.classList.toggle('on');
+    var text = document.getElementById('aiServiceText');
+    text.innerText = el.classList.contains('on') ? '开启' : '关闭';
+}
+
+function saveBusinessSetting() {
+    var aiServiceState = document.getElementById('aiServiceState').classList.contains('on') ? 'open' : 'close';
+    var aiPriority = document.getElementById('aiPriority').value;
+    var aiDelay = document.getElementById('aiDelay').value;
+    
+    $.post("{:url('admin/ai/saveBusinessSetting')}", {
+        ai_service_state: aiServiceState,
+        ai_priority: aiPriority,
+        ai_auto_reply_delay: aiDelay
+    }, function(res) {
+        layer.msg(res.msg);
+    }, 'json');
+}
+
+function createSwitch(id, isOn, textId) {
+    var bgColor = isOn ? '#10b981' : '#d9d9d9';
+    var circleLeft = isOn ? '26px' : '2px';
+    return '<div id="' + id + '" onclick="toggleSwitch(this, \'' + textId + '\')" style="width:52px;height:28px;background:' + bgColor + ';border-radius:14px;position:relative;cursor:pointer;display:inline-block;vertical-align:middle;transition:background 0.3s;">' +
+           '<div style="position:absolute;width:24px;height:24px;background:#fff;border-radius:50%;top:2px;left:' + circleLeft + ';transition:left 0.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2);"></div>' +
+           '</div>';
+}
+
+function openModelModal(data) {
+    data = data || {};
+    var isEdit = !!data.id;
+    
+    var modelTypeOptions = '';
+    for (var key in modelTypes) {
+        modelTypeOptions += '<option value="' + key + '"' + (data.model_type == key ? ' selected' : '') + '>' + modelTypes[key] + '</option>';
+    }
+    
+    var html = '<div style="padding: 20px;">' +
+        '<input type="hidden" id="modelId" value="' + (data.id || '') + '">' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">模型类型</label>' +
+        '<select id="modelType" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' + modelTypeOptions + '</select>' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">模型名称</label>' +
+        '<input type="text" id="modelName" placeholder="如：gpt-4o-mini" value="' + (data.model_name || '') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">API Key</label>' +
+        '<input type="text" id="apiKey" placeholder="请输入API密钥" value="' + (data.api_key || '') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">Secret Key（部分模型需要）</label>' +
+        '<input type="text" id="secretKey" placeholder="文心一言等模型需要" value="' + (data.secret_key || '') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">自定义API地址（可选）</label>' +
+        '<input type="text" id="apiUrl" placeholder="默认使用官方地址" value="' + (data.api_url || '') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">温度参数</label>' +
+        '<input type="number" id="temperature" value="' + (data.temperature || '0.7') + '" step="0.1" min="0" max="2" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">最大Token</label>' +
+        '<input type="number" id="maxTokens" value="' + (data.max_tokens || '2000') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">提示词模板（可选）</label>' +
+        '<textarea id="promptTemplate" placeholder="自定义提示词模板" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; min-height: 100px;">' + (data.prompt_template || '') + '</textarea>' +
+        '</div>' +
+        '<input type="hidden" id="isActive" value="1">' +
+        '<input type="hidden" id="isDefault" value="1">' +
+        '</div>';
+    
+    layer.open({
+        type: 1,
+        title: isEdit ? '编辑模型配置' : '添加模型配置',
+        area: ['520px', 'auto'],
+        content: html,
+        btn: ['保存', '取消'],
+        yes: function(index) {
+            saveModelConfig();
+            layer.close(index);
+        }
+    });
+}
+
+function editModel(id) {
+    $.get("{:url('admin/ai/index')}", {id: id}, function(res) {
+        if (res.code == 0) {
+            openModelModal(res.data);
+        } else {
+            layer.msg(res.msg);
+        }
+    }, 'json');
+}
+
+function toggleSwitch(el, textId) {
+    var circle = el.firstElementChild;
+    var isOn = el.style.background === 'rgb(16, 185, 129)' || el.style.background === '#10b981';
+    if (isOn) {
+        el.style.background = '#d9d9d9';
+        circle.style.left = '2px';
+        isOn = false;
+    } else {
+        el.style.background = '#10b981';
+        circle.style.left = '26px';
+        isOn = true;
+    }
+    var textEl = document.getElementById(textId);
+    if (textEl) {
+        if (textId === 'isDefaultText') {
+            textEl.innerText = isOn ? '是' : '否';
+        } else {
+            textEl.innerText = isOn ? '启用' : '禁用';
+        }
+    }
+}
+
+function saveModelConfig() {
+    var data = {
+        id: document.getElementById('modelId').value,
+        model_type: document.getElementById('modelType').value,
+        model_name: document.getElementById('modelName').value,
+        api_key: document.getElementById('apiKey').value,
+        secret_key: document.getElementById('secretKey').value,
+        api_url: document.getElementById('apiUrl').value,
+        temperature: document.getElementById('temperature').value,
+        max_tokens: document.getElementById('maxTokens').value,
+        prompt_template: document.getElementById('promptTemplate').value,
+        is_active: 1,
+        is_default: 1
+    };
+    
+    $.post("{:url('admin/ai/saveConfig')}", data, function(res) {
+        layer.msg(res.msg);
+        if (res.code == 0) {
+            location.reload();
+        }
+    }, 'json');
+}
+
+function deleteModel(id) {
+    layer.confirm('确定删除该模型配置？', function() {
+        $.post("{:url('admin/ai/deleteConfig')}", {id: id}, function(res) {
+            layer.msg(res.msg);
+            if (res.code == 0) {
+                location.reload();
+            }
+        }, 'json');
+    });
+}
+
+function testModel(id) {
+    layer.load(1);
+    $.post("{:url('admin/ai/testConfig')}", {id: id}, function(res) {
+        layer.closeAll('loading');
+        if (res.code == 0) {
+            layer.alert('测试成功！\n\n回复内容：\n' + res.data);
+        } else {
+            layer.alert('测试失败：' + res.msg);
+        }
+    }, 'json').error(function(xhr, status, error) {
+        layer.closeAll('loading');
+        layer.alert('请求失败：' + status);
+    });
+}
+
+function openTrainingModal(data) {
+    data = data || {};
+    var isEdit = !!data.id;
+    
+    var typeOptions = '';
+    for (var key in trainingTypes) {
+        typeOptions += '<option value="' + key + '"' + (data.type == key ? ' selected' : '') + '>' + trainingTypes[key] + '</option>';
+    }
+    
+    var html = '<div style="padding: 20px;">' +
+        '<input type="hidden" id="trainingId" value="' + (data.id || '') + '">' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">标题</label>' +
+        '<input type="text" id="trainingTitle" placeholder="如：产品A参数" value="' + (data.title || '') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">数据类型</label>' +
+        '<select id="trainingType" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' + typeOptions + '</select>' +
+        '</div>' +
+        '<div style="margin-bottom: 16px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">内容</label>' +
+        '<div style="display: flex; gap: 8px; margin-bottom: 8px; margin-left: -20px;">' +
+        '<button type="button" onclick="insertMedia(\'image\')" title="上传/插入图片" style="padding: 6px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0;">🖼️</button>' +
+        '<button type="button" onclick="insertMedia(\'video\')" title="上传/插入视频" style="padding: 6px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0;">🎬</button>' +
+        '<button type="button" onclick="insertMedia(\'link\')" title="插入超链接" style="padding: 6px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0;">🔗</button>' +
+        '<button type="button" onclick="insertMedia(\'html\')" title="插入HTML代码" style="padding: 6px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-family: monospace; font-weight: bold; font-size: 13px; flex-shrink: 0;">HTML</button>' +
+        '<button type="button" onclick="insertMedia(\'emoji\')" title="插入表情" style="padding: 6px 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0;">😊</button>' +
+        '</div>' +
+        '<input type="file" id="imageUpload" accept="image/*" style="display:none;" onchange="handleFileUpload(this, \'image\')">' +
+        '<input type="file" id="videoUpload" accept="video/*" style="display:none;" onchange="handleFileUpload(this, \'video\')">' +
+        '<textarea id="trainingContent" placeholder="请输入产品参数、常见问题、销售话术等内容..." style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; min-height: 150px; resize: vertical;">' + (data.content || '') + '</textarea>' +
+        '</div>' +
+        '<div style="margin-bottom: 20px;">' +
+        '<label style="display: block; text-align: left; margin-bottom: 6px; font-size: 14px; color: #666; font-weight: 500;">排序</label>' +
+        '<input type="number" id="trainingSort" value="' + (data.sort || '0') + '" style="width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; box-sizing: border-box; height: 42px;">' +
+        '</div>' +
+        '</div>';
+    
+    window._aiLayer = { trainingIndex: null, subIndex: null };
+    window._aiLayer.trainingIndex = layer.open({
+        type: 1,
+        title: isEdit ? '编辑训练数据' : '添加训练数据',
+        area: ['520px', '580px'],
+        content: html,
+        btn: ['保存', '取消'],
+        yes: function(index) {
+            saveTrainingData();
+            layer.close(index);
+        }
+    });
+}
+
+function editTraining(id) {
+    $.get("{:url('admin/ai/index')}", {training_id: id}, function(res) {
+        if (res.code == 0) {
+            openTrainingModal(res.trainingData);
+        } else {
+            layer.msg(res.msg);
+        }
+    }, 'json');
+}
+
+function saveTrainingData() {
+    var data = {
+        id: document.getElementById('trainingId').value,
+        title: document.getElementById('trainingTitle').value,
+        type: document.getElementById('trainingType').value,
+        content: document.getElementById('trainingContent').value,
+        sort: document.getElementById('trainingSort').value
+    };
+    
+    $.post("{:url('admin/ai/saveTraining')}", data, function(res) {
+        layer.msg(res.msg);
+        if (res.code == 0) {
+            location.reload();
+        }
+    }, 'json');
+}
+
+function deleteTraining(id) {
+    layer.confirm('确定删除该训练数据？', function() {
+        $.post("{:url('admin/ai/deleteTraining')}", {id: id}, function(res) {
+            layer.msg(res.msg);
+            if (res.code == 0) {
+                location.reload();
+            }
+        }, 'json');
+    });
+}
+
+function toggleTraining(id) {
+    $.post("{:url('admin/ai/toggleTraining')}", {id: id}, function(res) {
+        layer.msg(res.msg);
+    }, 'json');
+}
+
+function insertMedia(type) {
+    var textarea = document.getElementById('trainingContent');
+    if (!textarea) return;
+    
+    var insertText = '';
+    var emojiList = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐'];
+    
+    if (type === 'image') {
+        var imgHtml = '<div style="padding:15px;">' +
+            '<p style="margin-bottom:10px; color:#666;">请选择插入方式：</p>' +
+            '<div style="display:flex; gap:10px; margin-bottom:10px;">' +
+            '<button type="button" onclick="document.getElementById(\'imageUpload\').click()" style="flex:1; padding:12px; border:2px dashed #ccc; border-radius:8px; background:#fafafa; cursor:pointer;">📤 上传本地图片</button>' +
+            '<button type="button" onclick="promptImageUrl()" style="flex:1; padding:12px; border:2px dashed #ccc; border-radius:8px; background:#fafafa; cursor:pointer;">🔗 使用图片URL</button>' +
+            '</div>' +
+            '</div>';
+        window._aiLayer.subIndex = layer.open({type: 1, title: '插入图片', area: ['380px', 'auto'], content: imgHtml});
+    } else if (type === 'video') {
+        var vidHtml = '<div style="padding:15px;">' +
+            '<p style="margin-bottom:10px; color:#666;">请选择插入方式：</p>' +
+            '<div style="display:flex; gap:10px; margin-bottom:10px;">' +
+            '<button type="button" onclick="document.getElementById(\'videoUpload\').click()" style="flex:1; padding:12px; border:2px dashed #ccc; border-radius:8px; background:#fafafa; cursor:pointer;">📤 上传本地视频</button>' +
+            '<button type="button" onclick="promptVideoUrl()" style="flex:1; padding:12px; border:2px dashed #ccc; border-radius:8px; background:#fafafa; cursor:pointer;">🔗 使用视频URL</button>' +
+            '</div>' +
+            '</div>';
+        window._aiLayer.subIndex = layer.open({type: 1, title: '插入视频', area: ['380px', 'auto'], content: vidHtml});
+    } else if (type === 'link') {
+        layer.prompt({formType: 0, value: '', title: '请输入链接URL地址'}, function(value, index) {
+            insertText = '\n<a href="' + value + '" target="_blank">点击查看</a>\n';
+            insertToTextarea(textarea, insertText);
+            layer.close(index);
+        });
+    } else if (type === 'html') {
+        layer.prompt({formType: 2, value: '', title: '请输入HTML代码（支持自定义样式）', area: ['400px', '250px']}, function(value, index) {
+            insertText = '\n' + value + '\n';
+            insertToTextarea(textarea, insertText);
+            layer.close(index);
+        });
+    } else if (type === 'emoji') {
+        var emojiHtml = '<div style="padding:10px; display:flex; flex-wrap:wrap; gap:6px; max-width:300px;">';
+        for (var i = 0; i < emojiList.length; i++) {
+            emojiHtml += '<span style="cursor:pointer; font-size:22px; padding:4px;" onclick="selectEmoji(\'' + emojiList[i] + '\')">' + emojiList[i] + '</span>';
+        }
+        emojiHtml += '</div>';
+        window._aiLayer.subIndex = layer.open({type: 1, title: '选择表情', area: ['330px', 'auto'], content: emojiHtml});
+    }
+}
+
+function promptImageUrl() {
+    if (window._aiLayer && window._aiLayer.subIndex !== null) {
+        layer.close(window._aiLayer.subIndex);
+    }
+    layer.prompt({formType: 0, value: '', title: '请输入图片URL地址'}, function(value, index) {
+        var textarea = document.getElementById('trainingContent');
+        insertText = '\n<img src="' + value + '" alt="图片" style="max-width:100%;" />\n';
+        insertToTextarea(textarea, insertText);
+        layer.close(index);
+    });
+}
+
+function promptVideoUrl() {
+    if (window._aiLayer && window._aiLayer.subIndex !== null) {
+        layer.close(window._aiLayer.subIndex);
+    }
+    layer.prompt({formType: 0, value: '', title: '请输入视频URL地址（mp4）'}, function(value, index) {
+        var textarea = document.getElementById('trainingContent');
+        insertText = '\n<video src="' + value + '" controls style="max-width:100%;"></video>\n';
+        insertToTextarea(textarea, insertText);
+        layer.close(index);
+    });
+}
+
+function handleFileUpload(input, type) {
+    var file = input.files[0];
+    if (!file) return;
+    
+    var textarea = document.getElementById('trainingContent');
+    var insertText = '';
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+        var dataUrl = e.target.result;
+        if (type === 'image') {
+            insertText = '\n<img src="' + dataUrl + '" alt="' + file.name + '" style="max-width:100%;" />\n';
+        } else if (type === 'video') {
+            insertText = '\n<video src="' + dataUrl + '" controls style="max-width:100%;"></video>\n';
+        }
+        insertToTextarea(textarea, insertText);
+        input.value = '';
+    };
+    
+    reader.readAsDataURL(file);
+    if (window._aiLayer && window._aiLayer.subIndex !== null) {
+        layer.close(window._aiLayer.subIndex);
+    }
+}
+
+function selectEmoji(emoji) {
+    var textarea = document.getElementById('trainingContent');
+    insertToTextarea(textarea, emoji);
+    if (window._aiLayer && window._aiLayer.subIndex !== null) {
+        layer.close(window._aiLayer.subIndex);
+    }
+}
+
+function insertToTextarea(textarea, text) {
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var value = textarea.value;
+    textarea.value = value.substring(0, start) + text + value.substring(end);
+    textarea.selectionStart = start + text.length;
+    textarea.selectionEnd = start + text.length;
+    textarea.focus();
+}
+
+document.getElementById('aiServiceState').classList.toggle('on', '{$business['ai_service_state']}' == 'open');
+</script>
+{include file="public/footer"/}

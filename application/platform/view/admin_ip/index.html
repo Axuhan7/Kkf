@@ -1,0 +1,198 @@
+<style>
+    .ip-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .ip-table th, .ip-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e5e3e9;
+    }
+    .ip-table th {
+        background-color: #f7f7f7;
+        font-weight: 600;
+        color: #555;
+        font-size: 13px;
+    }
+    .ip-table tr:hover {
+        background-color: #f9f9f9;
+    }
+    .ip-address {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 14px;
+        color: #05202d;
+        font-weight: 500;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+    .status-enabled {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+    .status-disabled {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+    .btn-action {
+        padding: 4px 12px;
+        margin: 0 2px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-edit {
+        background-color: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #bbdefb;
+    }
+    .btn-delete {
+        background-color: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+    }
+    .btn-toggle {
+        background-color: #fff3e0;
+        color: #e65100;
+        border: 1px solid #ffe0b2;
+    }
+    .btn-add {
+        display: inline-block;
+        padding: 10px 24px;
+        background-color: #05202d;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    .btn-add:hover {
+        background-color: #0a3050;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .page-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+    .empty-tip {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+</style>
+
+<div class="page-header">
+    <div class="page-title">管理员IP白名单管理</div>
+    <div>
+        <a href="{:url('adminIp/log')}" class="btn-action btn-edit" style="padding: 8px 16px;">访问日志</a>
+        <a href="{:url('adminIp/add')}" class="btn-add">+ 添加IP</a>
+    </div>
+</div>
+
+<div class="card-body">
+    {if condition="$list"}
+    <table class="ip-table">
+        <thead>
+            <tr>
+                <th style="width: 60px;">ID</th>
+                <th>IP地址</th>
+                <th>备注</th>
+                <th style="width: 100px;">状态</th>
+                <th style="width: 160px;">添加时间</th>
+                <th style="width: 200px;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {volist name="list" id="vo"}
+            <tr>
+                <td>{$vo.id}</td>
+                <td><span class="ip-address">{$vo.ip_address}</span></td>
+                <td>{$vo.remark}</td>
+                <td>
+                    <span class="status-badge {$vo.status == 1 ? 'status-enabled' : 'status-disabled'}">
+                        {$vo.status == 1 ? '启用' : '禁用'}
+                    </span>
+                </td>
+                <td>{$vo.createtime|date='Y-m-d H:i:s',###}</td>
+                <td>
+                    <a href="{:url('adminIp/edit', ['id' => $vo.id])}" class="btn-action btn-edit">编辑</a>
+                    <a href="javascript:;" class="btn-action btn-toggle" onclick="toggleStatus({$vo.id}, this)">{$vo.status == 1 ? '禁用' : '启用'}</a>
+                    <a href="javascript:;" class="btn-action btn-delete" onclick="delIp({$vo.id})">删除</a>
+                </td>
+            </tr>
+            {/volist}
+        </tbody>
+    </table>
+    {else/}
+    <div class="empty-tip">
+        <p>暂无IP白名单记录，请点击上方"添加IP"按钮添加。</p>
+        <p style="margin-top: 10px; font-size: 12px; color: #bbb;">提示：白名单为空时，所有IP均可访问后台</p>
+    </div>
+    {/if}
+</div>
+
+<script>
+function delIp(id) {
+    if (!confirm('确定要删除该IP吗？')) return;
+
+    $.ajax({
+        url: "/platform/admin_ip/delete",
+        type: 'post',
+        data: { id: id },
+        dataType: 'json',
+        success: function(res) {
+            if (res.code == 0) {
+                $.myToast({ content: res.msg });
+                setTimeout(function() { location.reload(); }, 1000);
+            } else {
+                $.myAlert({ content: res.msg || '删除失败' });
+            }
+        },
+        error: function(xhr, status, error) {
+            $.myAlert({ content: '网络错误，请重试' });
+        }
+    });
+}
+
+function toggleStatus(id, elem) {
+    var btn = $(elem);
+    btn.css('pointer-events', 'none').text('处理中...');
+
+    $.ajax({
+        url: "/platform/admin_ip/toggleStatus",
+        type: 'post',
+        data: { id: id },
+        dataType: 'json',
+        success: function(res) {
+            btn.css('pointer-events', '').text('');
+            if (res.code == 0) {
+                var newStatus = res.status;
+                btn.text(newStatus == 1 ? '禁用' : '启用');
+                var badge = btn.closest('tr').find('.status-badge');
+                badge.text(newStatus == 1 ? '启用' : '禁用');
+                badge.removeClass('status-enabled status-disabled')
+                     .addClass(newStatus == 1 ? 'status-enabled' : 'status-disabled');
+                $.myToast({ content: res.msg });
+            } else {
+                btn.text(res.status == 1 ? '禁用' : '启用');
+                $.myAlert({ content: res.msg || '操作失败' });
+            }
+        },
+        error: function(xhr, status, error) {
+            btn.css('pointer-events', '').text('禁用/启用');
+            $.myAlert({ content: '网络错误：' + status });
+        }
+    });
+}
+</script>

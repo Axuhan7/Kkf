@@ -1,0 +1,583 @@
+{include file="public/header"/}
+
+<style>
+    #container{
+        padding: 0;
+        background-color: #fff;
+    }
+    #layui-container{
+        margin: 40px 0 0 40px;
+    }
+    .page-header{
+        padding-bottom: 10px;
+        border-bottom: 0;
+    }
+    #layui-container .back{
+        height: 32px;
+        width: 110px;
+        line-height: 32px;
+        text-align: center;
+        font-size: 13px;
+        color: #555555;
+        border: 1px solid #e5e3e9;
+        border-radius: 16px;
+        margin-top: -10px;
+    }
+    #layui-container .back .img{
+        width: 16px;
+        height: 16px;
+        margin: 6px 0 0 16px;
+        float: left;
+        background: url("__image__/admin/B/back-system.png");
+    }
+    .layui-form{
+        margin-top: 20px;
+    }
+    .layui-form-item .layui-form-label{
+        font-size: 14px;
+        padding: 10px;
+        color: #999999;
+        width: 166px;
+    }
+    .layui-form-item .layui-input-block{
+        margin-left:188px;
+        width: 1000px;
+    }
+    .layui-form-item .layui-input-block input{
+        color: #555555;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    input::-webkit-input-placeholder {
+        color: #dddddd;
+        font-size:14px;
+    }
+    input:-moz-placeholder {
+        /* Mozilla Firefox 4 to 18 */
+        color: #dddddd;
+        font-size:14px;
+    }
+    input::-moz-placeholder {
+        /* Mozilla Firefox 19+ */
+        color: #dddddd;
+        font-size:14px;
+    }
+    input:-ms-input-placeholder {
+        /* Internet Explorer 10+ */
+        color: #dddddd;
+        font-size:14px;
+    }
+    button.keep{
+        width: 66px;
+        height: 36px;
+        color: #ffffff;
+        font-size: 13px;
+        background-color: #25c16f;
+        border-radius: 16px;
+    }
+    button.reset{
+        width: 66px;
+        height: 36px;
+        color: #555555;
+        font-size: 13px;
+        background-color: #f7f7f7;
+        border-radius: 16px;
+        border:0;
+    }
+    .layui-form-item{margin-bottom:15px;}
+    .menu-section{margin-top:40px;border-top:1px solid #eee;padding-top:30px;}
+    .menu-section h3{font-size:16px;color:#555;margin-bottom:20px;}
+    .menu-preview{width:360px;border:1px solid #ddd;border-radius:8px;overflow:hidden;float:left;margin-right:40px;}
+    .menu-preview-bar{background:#f7f7f7;border-bottom:1px solid #ddd;padding:10px;text-align:center;font-size:14px;color:#333;}
+    .menu-preview-body{height:400px;background:#fff;position:relative;}
+    .menu-preview-bottom{display:flex;border-top:1px solid #ddd;}
+    .menu-preview-bottom .menu-item-preview{flex:1;text-align:center;padding:10px 5px;font-size:13px;color:#333;cursor:pointer;border-right:1px solid #ddd;position:relative;}
+    .menu-preview-bottom .menu-item-preview:last-child{border-right:none;}
+    .menu-preview-bottom .menu-item-preview.active{background:#e8f5e9;color:#25c16f;}
+    .menu-preview-bottom .menu-item-preview .sub-menu{display:none;position:absolute;bottom:100%;left:0;right:0;border:1px solid #ddd;border-bottom:none;background:#fff;}
+    .menu-preview-bottom .menu-item-preview .sub-menu .sub-item{padding:8px 5px;font-size:12px;border-bottom:1px solid #eee;cursor:pointer;}
+    .menu-preview-bottom .menu-item-preview .sub-menu .sub-item:last-child{border-bottom:none;}
+    .menu-preview-bottom .menu-item-preview .sub-menu .sub-item.active{background:#e8f5e9;color:#25c16f;}
+    .menu-preview-bottom .menu-item-preview:hover .sub-menu{display:block;}
+    .menu-editor{flex:1;}
+    .menu-editor .menu-form-item{display:flex;align-items:center;margin-bottom:10px;}
+    .menu-editor .menu-form-item label{width:80px;font-size:13px;color:#666;}
+    .menu-editor .menu-form-item input,.menu-editor .menu-form-item select{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:13px;}
+    .menu-btn-row{margin-top:15px;}
+    .menu-btn-row button{margin-right:10px;}
+    .menu-tip{color:#999;font-size:12px;margin-top:5px;}
+</style>
+<div id="container" style="padding-bottom: 42px">
+    <div id="layui-container">
+        <h2 class="page-header" style="font-size: 18px;color: #555555;"> 公众号与模板消息设置</h2>
+        <a href="{:url('admin/index/set')}">
+            <div class="back">
+                <i class="img"></i>
+                <span>返回设置</span>
+            </div>
+        </a>
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">原始id</label>
+                <div class="layui-input-block">
+                    <input type="text" name="wx_id" placeholder="请输入公众号原始id"
+                           autocomplete="off" class="layui-input" value="{$template['wx_id']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">公众号AppId</label>
+                <div class="layui-input-block">
+                    <input type="text" name="app_id" placeholder="请输入公众号AppId"
+                           autocomplete="off" class="layui-input" value="{$template['app_id']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">公众号AppSecret</label>
+                <div class="layui-input-block">
+                    <input type="text" name="app_secret" placeholder="请输入公众号AppSecret"
+                           autocomplete="off" class="layui-input" value="{$template['app_secret']}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">公众号token</label>
+                <div class="layui-input-block" style="display: flex;flex-wrap: nowrap;">
+                    <input type="text" name="wx_token" id="wx_token" placeholder="请输入公众号token"
+                           autocomplete="off" class="layui-input" value="{$template['wx_token']}"> <button class="layui-btn layui-btn-normal" onclick="creattoken('#wx_token')" type="button">生成token</button>
+                </div>
+            </div>
+            <!--<div class="layui-form-item">
+                <label class="layui-form-label">关注二维码</label>
+                <div class="layui-input-block" style="display: flex;flex-wrap: nowrap;">
+                    <input type="text" name="wx_erwm" id="wx_erwm" placeholder="请上传公众号二维码"
+                           autocomplete="off" class="layui-input" value=""> <button class="layui-btn" id="test1">上传图片</button>
+                </div>
+            </div>-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否开启引导关注</label>
+                <div class="layui-input-block" style="display: flex;flex-wrap: nowrap;">
+                    <input type="checkbox" name="isscribe" <?php if($template['isscribe'])echo 'checked';?> lay-skin="switch" lay-filter="switchTest" lay-text="开|关" value="1">
+                    <div style="color: #636c72;position:absolute;left: 60px;top:10px;">关注后支持离线回复来客</div>
+                </div>
+
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">AESKey</label>
+                <div class="layui-input-block">
+                    <input type="text" name="wx_aeskey" placeholder="消息加解密密钥(EncodingAESKey),明文格式请留空"
+                           autocomplete="off" class="layui-input" value="{$template['wx_aeskey']}">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">新访客提醒模板消息ID</label>
+                <div class="layui-input-block">
+                    <input type="text" name="visitor_tpl" placeholder="新访客提醒模板消息ID"
+                           autocomplete="off" class="layui-input" value="{$template['visitor_tpl']}">
+                </div>
+                <div style="color: #636c72;position:absolute;left: 235px;padding-bottom: 5px">模板编号: OPENTM416331462 <a onclick="tpl('visitor_tpl')" href="#" style="color: #0275d8;">查看模板消息格式</a></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">新消息提醒模板消息ID</label>
+                <div class="layui-input-block">
+                    <input type="text" name="msg_tpl"  placeholder="新消息提醒模板消息ID"
+                           autocomplete="off" class="layui-input" value="{$template['msg_tpl']}">
+                </div>
+                <div style="color: #636c72;position:absolute;left: 235px;padding-bottom: 5px">模板编号: OPENTM411628723 <a onclick="tpl('msg_tpl')" href="#" style="color: #0275d8;">查看模板消息格式</a>
+                    </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">客服回复模板消息ID</label>
+                <div class="layui-input-block">
+                    <input type="text" name="customer_tpl"  placeholder="客服回复提醒模板消息ID"
+                           autocomplete="off" class="layui-input" value="{$template['customer_tpl']}">
+                </div>
+                <div style="color: #636c72;position:absolute;left: 235px;padding-bottom: 5px">模板编号: OPENTM415064191 <a onclick="tpl('customer_tpl')" href="#" style="color: #0275d8;">查看模板消息格式</a>
+                    此模板消息仅用于微信公众号链接，已关注该公众号并已授权登录的用户</div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><b>服务器地址(URL)</b></label>
+                <div class="layui-input-block">{:url('weixin/index/index',['business_id'=>$business_id],false,true)}
+                    <div style="color: #636c72;">此地址填写到公众号后台服务器地址(URL)中</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;padding-top: 20px;border-top: 1px solid #eee;">
+                <h3 style="font-size: 16px;color: #555;margin-bottom: 20px;">自动回复设置</h3>
+                <div style="color: #999;font-size: 13px;margin-bottom: 20px;">对接微信后，公众号后台的自动回复设置将失效，请在此处配置</div>
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">被关注回复</label>
+                    <div class="layui-input-block">
+                        <textarea name="subscribe_reply" placeholder="用户关注公众号时自动回复的内容" class="layui-textarea" style="height: 100px;">{$template['subscribe_reply']}</textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">收到消息回复</label>
+                    <div class="layui-input-block">
+                        <textarea name="msg_reply" placeholder="用户发送任意消息时自动回复的内容（未匹配到关键词时触发）" class="layui-textarea" style="height: 100px;">{$template['msg_reply']}</textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">关键词回复</label>
+                    <div class="layui-input-block">
+                        <textarea name="keyword_reply" placeholder='{"关键词1":"回复内容1","关键词2":"回复内容2"}' class="layui-textarea" style="height: 100px;">{$template['keyword_reply']}</textarea>
+                    </div>
+                    <div style="color: #636c72;position:absolute;left: 235px;padding-bottom: 5px;">格式：{"关键词1":"回复内容1","关键词2":"回复内容2"} 用户发送的消息匹配到关键词时自动回复</div>
+                </div>
+            </div>
+
+            <div class="layui-form-item" style="margin-top: 25px;">
+                <label class="layui-form-label">描述</label>
+                <div class="layui-input-block">
+                    <input type="text" name="desc" placeholder="请输入描述" autocomplete="off" class="layui-input"
+                           value="{$template['desc']}">
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;padding-top: 20px;border-top: 1px solid #eee;">
+                <h3 style="font-size: 16px;color: #555;margin-bottom: 20px;">小程序配置</h3>
+                <div style="color: #999;font-size: 13px;margin-bottom: 20px;">配置后，小程序用户发送的消息将自动进入客服系统</div>
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">小程序AppId</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="mini_app_id" placeholder="请输入小程序AppId"
+                               autocomplete="off" class="layui-input" value="{$template['mini_app_id']}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">小程序AppSecret</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="mini_app_secret" placeholder="请输入小程序AppSecret"
+                               autocomplete="off" class="layui-input" value="{$template['mini_app_secret']}">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">小程序token</label>
+                    <div class="layui-input-block" style="display: flex;flex-wrap: nowrap;">
+                        <input type="text" name="mini_wx_token" id="mini_wx_token" placeholder="请输入小程序token"
+                               autocomplete="off" class="layui-input" value="{$template['mini_wx_token']}"> <button class="layui-btn layui-btn-normal" onclick="creattoken('#mini_wx_token')" type="button">生成token</button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">小程序AESKey</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="mini_wx_aeskey" placeholder="消息加解密密钥(EncodingAESKey),明文格式请留空"
+                               autocomplete="off" class="layui-input" value="{$template['mini_wx_aeskey']}">
+                    </div>
+                </div>
+
+                <div style="width:500px;color:#aaa;padding-bottom: 20px;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><b>小程序消息推送地址</b></label>
+                        <div class="layui-input-block" >{:url('weixin/mini/index',['business_id'=>$business_id],false,true)}
+                            <div style="color: #636c72;">此地址填写到小程序后台"消息推送"的服务器地址中</div>
+                     </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn keep" lay-submit lay-filter="template">保存</button>
+                    <button type="reset" class="layui-btn layui-btn-primary reset">重置</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 自定义菜单管理 -->
+        <div class="menu-section">
+            <h3>自定义菜单管理</h3>
+            <div style="display:flex;">
+                <div class="menu-preview">
+                    <div class="menu-preview-bar">公众号菜单预览</div>
+                    <div class="menu-preview-body"></div>
+                    <div class="menu-preview-bottom" id="menuPreviewBottom"></div>
+                </div>
+                <div class="menu-editor">
+                    <div id="menuEditorContent">
+                        <p style="color:#999;font-size:13px;">添加菜单-保存菜单配置-发布到微信</p>
+                    </div>
+                    <div class="menu-btn-row">
+                        <button type="button" class="layui-btn layui-btn-normal" id="btnAddMenu" style="background-color:#25c16f;color:#fff;">添加一级菜单</button>
+                        <button type="button" class="layui-btn" id="btnSaveMenu" style="background-color:#25c16f;">保存菜单配置</button>
+                        <button type="button" class="layui-btn layui-btn-normal" id="btnPublishMenu">发布到微信</button>
+                    </div>
+                    <div class="menu-tip">提示：一级菜单最多3个，每个一级菜单下子菜单最多5个。菜单名称不超过4个汉字或8个字母。保存后需点击"发布到微信"才能生效。</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="width:500px;color:#aaa;padding-bottom: 50px;">
+            <h4 style="margin-bottom:30px;">点击预览框中需要修改的菜单，在右侧修改</h4>
+            <!--<div class="layui-form-item">
+                <label class="layui-form-label"><b>IP白名单</b></label>
+                <div class="layui-form-label">
+                    <?php echo $_SERVER['REMOTE_ADDR']; ?>                </div>
+
+            </div>-->
+            <div class="layui-form-item">
+                <label class="layui-form-label"><b>服务器地址(URL)</b></label>
+                <div class="layui-input-block" >{:url('weixin/index/index',['business_id'=>$business_id],false,true)}
+                    <div style="color: #636c72;">此地址填写到公众号后台服务器地址(URL)中</div>
+             </div>
+
+            </div>
+        </div>
+
+        <script>
+            function creattoken(d,len=32){
+                var $chars = 'I1UuVv9gqoOLlABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+                var maxPos = $chars.length;
+                var pwd = '';
+                for (i = 0; i < len; i++) {
+                    pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+                }
+                $(d).val(pwd);
+                return false;
+            }
+            layui.use(['form','upload'], function () {
+                var form = layui.form,upload = layui.upload;
+                //普通图片上传
+                var uploadInst = upload.render({
+                    elem: '#test1'
+                    ,accept: 'images'
+                    ,url: YMWL_ROOT_URL+'/admin/manager/uploadpic.html' //改成您自己的上传接口
+                    ,before: function(obj){
+                        //预读本地文件示例，不支持ie8
+                    }
+                    ,done: function(res){
+                        //如果上传失败
+                        if(res.code > 0){
+                            return layer.msg('上传失败');
+                        }
+                        //上传成功
+                    }
+                    ,error: function(){
+                        //演示失败状态，并实现重传
+                        var demoText = $('#demoText');
+                        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                        demoText.find('.demo-reload').on('click', function(){
+                            uploadInst.upload();
+                        });
+                    }
+                });
+                //监听提交
+                form.on('submit(template)', function (data) {
+                    $.post("{:url('template')}", data.field, function (res) {
+                        if (res.code == 0) {
+                            layer.msg(res.msg, {
+                                icon: 1, end: function () {
+                                    location.reload();
+                                }
+                            });
+                        } else {
+                            layer.msg(res.msg, {
+                                icon: 2, end: function () {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+
+                    return false;
+                });
+            });
+
+            function tpl(name)
+            {
+                layer.open({
+                    type: 2,
+                    skin:"tablist",
+                    title:"教程",
+                    area: ['1020px', '800px'],shadeClose:true,
+                    content: YMWL_ROOT_URL + '/assets/images/admin/'+name+'.png'
+                });
+            }
+        </script>
+    </div>
+</div>
+
+<script>
+// 菜单管理
+(function(){
+    var menuData = <?php echo $menu_json; ?>;
+    var selectedMenu = null; // {type:'main'|'sub', mainIndex, subIndex}
+
+    function renderPreview(){
+        var html = '';
+        for(var i=0;i<menuData.length;i++){
+            var item = menuData[i];
+            var hasSub = item.sub_button && item.sub_button.length > 0;
+            var activeClass = (selectedMenu && selectedMenu.type==='main' && selectedMenu.mainIndex===i) ? ' active' : '';
+            html += '<div class="menu-item-preview'+activeClass+'" data-main="'+i+'">';
+            if(hasSub){
+                html += '<div class="sub-menu">';
+                for(var j=0;j<item.sub_button.length;j++){
+                    var sub = item.sub_button[j];
+                    var subActive = (selectedMenu && selectedMenu.type==='sub' && selectedMenu.mainIndex===i && selectedMenu.subIndex===j) ? ' active' : '';
+                    html += '<div class="sub-item'+subActive+'" data-main="'+i+'" data-sub="'+j+'">'+(sub.name||'未命名')+'</div>';
+                }
+                html += '</div>';
+            }
+            html += (item.name||'未命名')+'</div>';
+        }
+        document.getElementById('menuPreviewBottom').innerHTML = html;
+
+        var items = document.querySelectorAll('#menuPreviewBottom .menu-item-preview');
+        for(var k=0;k<items.length;k++){
+            items[k].onclick = function(e){
+                if(e.target.classList.contains('sub-item')) return;
+                var idx = parseInt(this.getAttribute('data-main'));
+                selectedMenu = {type:'main', mainIndex:idx};
+                renderPreview();
+                renderEditor();
+            };
+        }
+        var subs = document.querySelectorAll('#menuPreviewBottom .sub-item');
+        for(var m=0;m<subs.length;m++){
+            subs[m].onclick = function(e){
+                e.stopPropagation();
+                var mi = parseInt(this.getAttribute('data-main'));
+                var si = parseInt(this.getAttribute('data-sub'));
+                selectedMenu = {type:'sub', mainIndex:mi, subIndex:si};
+                renderPreview();
+                renderEditor();
+            };
+        }
+    }
+
+    function renderEditor(){
+        if(!selectedMenu){
+            document.getElementById('menuEditorContent').innerHTML = '<p style="color:#999;font-size:13px;">添加菜单-保存菜单配置-发布到微信</p>';
+            return;
+        }
+        var item;
+        if(selectedMenu.type==='main'){
+            item = menuData[selectedMenu.mainIndex];
+            var hasSub = item.sub_button && item.sub_button.length > 0;
+            var html = '<div style="margin-bottom:15px;font-size:14px;font-weight:bold;color:#333;">编辑一级菜单：'+(item.name||'未命名')+'</div>';
+            html += '<div class="menu-form-item"><label>菜单名称</label><input type="text" id="ed_name" value="'+(item.name||'')+'" maxlength="8" placeholder="不超过4个汉字"></div>';
+            html += '<div class="menu-form-item"><label>菜单类型</label><select id="ed_type"><option value="view"'+(item.type==='view'?' selected':'')+'>跳转网页</option><option value="click"'+(item.type==='click'?' selected':'')+'>点击事件</option></select></div>';
+            html += '<div class="menu-form-item"><label>链接/Key</label><input type="text" id="ed_url" value="'+(item.url||item.key||'')+'" placeholder="网页链接或事件Key"></div>';
+            html += '<div style="margin-top:15px;">';
+            html += '<button type="button" class="layui-btn layui-btn-sm" id="btnAddSub" style="background-color:#25c16f;">+ 添加子菜单</button> ';
+            html += '<button type="button" class="layui-btn layui-btn-sm layui-btn-danger" id="btnDelMain">删除此菜单</button>';
+            html += '</div>';
+            document.getElementById('menuEditorContent').innerHTML = html;
+
+            document.getElementById('ed_name').oninput = function(){
+                menuData[selectedMenu.mainIndex].name = this.value;
+                renderPreview();
+            };
+            document.getElementById('ed_type').onchange = function(){
+                menuData[selectedMenu.mainIndex].type = this.value;
+                if(this.value==='view'){
+                    menuData[selectedMenu.mainIndex].url = document.getElementById('ed_url').value;
+                    delete menuData[selectedMenu.mainIndex].key;
+                } else {
+                    menuData[selectedMenu.mainIndex].key = document.getElementById('ed_url').value;
+                    delete menuData[selectedMenu.mainIndex].url;
+                }
+            };
+            document.getElementById('ed_url').oninput = function(){
+                var t = document.getElementById('ed_type').value;
+                if(t==='view') menuData[selectedMenu.mainIndex].url = this.value;
+                else menuData[selectedMenu.mainIndex].key = this.value;
+            };
+            var btnAddSub = document.getElementById('btnAddSub');
+            if(btnAddSub){
+                btnAddSub.onclick = function(){
+                    if(!menuData[selectedMenu.mainIndex].sub_button) menuData[selectedMenu.mainIndex].sub_button=[];
+                    if(menuData[selectedMenu.mainIndex].sub_button.length>=5){layer.msg('子菜单最多5个');return;}
+                    menuData[selectedMenu.mainIndex].sub_button.push({type:'view',name:'新菜单',url:''});
+                    selectedMenu = {type:'sub', mainIndex:selectedMenu.mainIndex, subIndex:menuData[selectedMenu.mainIndex].sub_button.length-1};
+                    renderPreview();
+                    renderEditor();
+                };
+            }
+            document.getElementById('btnDelMain').onclick = function(){
+                menuData.splice(selectedMenu.mainIndex,1);
+                selectedMenu=null;
+                renderPreview();
+                renderEditor();
+            };
+        } else {
+            item = menuData[selectedMenu.mainIndex].sub_button[selectedMenu.subIndex];
+            var html = '<div style="margin-bottom:15px;font-size:14px;font-weight:bold;color:#333;">编辑子菜单：'+(item.name||'未命名')+'</div>';
+            html += '<div class="menu-form-item"><label>菜单名称</label><input type="text" id="ed_name" value="'+(item.name||'')+'" maxlength="8" placeholder="不超过4个汉字"></div>';
+            html += '<div class="menu-form-item"><label>菜单类型</label><select id="ed_type"><option value="view"'+(item.type==='view'?' selected':'')+'>跳转网页</option><option value="click"'+(item.type==='click'?' selected':'')+'>点击事件</option></select></div>';
+            html += '<div class="menu-form-item"><label>链接/Key</label><input type="text" id="ed_url" value="'+(item.url||item.key||'')+'" placeholder="网页链接或事件Key"></div>';
+            html += '<div style="margin-top:15px;"><button type="button" class="layui-btn layui-btn-sm layui-btn-danger" id="btnDelSub">删除此子菜单</button></div>';
+            document.getElementById('menuEditorContent').innerHTML = html;
+
+            document.getElementById('ed_name').oninput = function(){
+                menuData[selectedMenu.mainIndex].sub_button[selectedMenu.subIndex].name = this.value;
+                renderPreview();
+            };
+            document.getElementById('ed_type').onchange = function(){
+                var mi=selectedMenu.mainIndex, si=selectedMenu.subIndex;
+                menuData[mi].sub_button[si].type = this.value;
+                if(this.value==='view'){
+                    menuData[mi].sub_button[si].url = document.getElementById('ed_url').value;
+                    delete menuData[mi].sub_button[si].key;
+                } else {
+                    menuData[mi].sub_button[si].key = document.getElementById('ed_url').value;
+                    delete menuData[mi].sub_button[si].url;
+                }
+            };
+            document.getElementById('ed_url').oninput = function(){
+                var t = document.getElementById('ed_type').value;
+                var mi=selectedMenu.mainIndex, si=selectedMenu.subIndex;
+                if(t==='view') menuData[mi].sub_button[si].url = this.value;
+                else menuData[mi].sub_button[si].key = this.value;
+            };
+            document.getElementById('btnDelSub').onclick = function(){
+                menuData[selectedMenu.mainIndex].sub_button.splice(selectedMenu.subIndex,1);
+                selectedMenu={type:'main',mainIndex:selectedMenu.mainIndex};
+                renderPreview();
+                renderEditor();
+            };
+        }
+    }
+
+    document.getElementById('btnAddMenu').onclick = function(){
+        if(menuData.length>=3){layer.msg('一级菜单最多3个');return;}
+        menuData.push({name:'新菜单',type:'view',url:''});
+        selectedMenu = {type:'main', mainIndex:menuData.length-1};
+        renderPreview();
+        renderEditor();
+    };
+
+    document.getElementById('btnSaveMenu').onclick = function(){
+        $.post("{:url('admin/index/savemenu')}", {menu_config: JSON.stringify(menuData)}, function(res){
+            if(res.code==0){
+                layer.msg('保存成功',{icon:1});
+            } else {
+                layer.msg(res.msg||'保存失败',{icon:2});
+            }
+        });
+    };
+
+    document.getElementById('btnPublishMenu').onclick = function(){
+        $.post("{:url('admin/index/publishmenu')}", {}, function(res){
+            if(res.code==0){
+                layer.msg('发布成功，请在微信中查看效果',{icon:1});
+            } else {
+                layer.msg(res.msg||'发布失败',{icon:2});
+            }
+        });
+    };
+
+    renderPreview();
+})();
+</script>
+
+
+{include file="public/footer"/}
