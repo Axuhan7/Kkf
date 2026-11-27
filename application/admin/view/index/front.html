@@ -14,8 +14,9 @@
                     <div class="layui-card-header" style="font-weight:600;">App 用户资料同步接口（邮箱 / 实名信息）</div>
                     <div class="layui-card-body" style="line-height:1.7;font-size:13px;color:#444;">
                         <p>用户通过 App 访问客服时，把邮箱、实名等资料传进来，客服后台「客户咨询 → 访客信息」即可看到。</p>
+                        <p style="margin-top:8px;color:#a00;"><b>安全说明：</b>邮箱 / 实名 / 证件号 / 手机等敏感字段，链接上必须带有效 <code>timestamp+sign</code>（或改用方式二 API）。无签名链接只能传昵称、头像等展示字段，防止他人伪造实名资料。</p>
                         <p style="margin-top:8px;"><b>方式一：打开客服链接时带参数（H5 / App WebView）</b></p>
-                        <pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;white-space:pre-wrap;">{$action}/index/index/home?business_id={$login.business_id}&amp;visiter_id=APP用户ID&amp;visiter_name=昵称&amp;avatar=头像URL&amp;email=user@example.com&amp;real_name=真实姓名&amp;id_card=身份证号&amp;phone=手机号&amp;gender=男&amp;app_vip=黄金会员</pre>
+                        <pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;white-space:pre-wrap;">{$action}/index/index/home?business_id={$login.business_id}&amp;visiter_id=APP用户ID&amp;visiter_name=昵称&amp;avatar=头像URL&amp;email=user@example.com&amp;real_name=真实姓名&amp;id_card=身份证号&amp;phone=手机号&amp;gender=男&amp;timestamp=1710000000&amp;sign=md5(business_id#visiter_id#timestamp#app_secret)</pre>
                         <p style="margin-top:8px;">或在嵌入 JS 前设置：</p>
                         <pre style="background:#f7f7f7;padding:12px;border-radius:6px;overflow:auto;white-space:pre-wrap;">&lt;script&gt;
 var ymwl = {

@@ -23,7 +23,12 @@ class Visiter extends Base
        if( $istop === '' || $visiter_id === ''){
            $this->error('参数非法');
        }
-       $res=Db::name('visiter')->where('visiter_id',$visiter_id)->update(['istop'=>$istop]);
+       $login = session('Msg');
+       $bizId = isset($login['business_id']) ? (int)$login['business_id'] : 0;
+       if ($bizId <= 0) {
+           $this->error('未登录');
+       }
+       $res=Db::name('visiter')->where(['visiter_id'=>$visiter_id,'business_id'=>$bizId])->update(['istop'=>$istop]);
        if($res){
            $this->success('修改成功');
        }else{

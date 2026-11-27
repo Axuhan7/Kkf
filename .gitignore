@@ -5,3 +5,6 @@ runtime/temp/*
 runtime/log/*
 runtime/ai_lock/*
 !runtime/.gitkeep
+
+ymwl_pusher/vendor/workerman/*.pid
+ymwl_pusher/vendor/workerman/workerman.log

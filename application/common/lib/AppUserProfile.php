@@ -30,6 +30,52 @@ class AppUserProfile
         ];
     }
 
+    /**
+     * Fields that identify a real person — require signed / token sync to write.
+     * Unsigned URL params must not overwrite these (anti-tamper).
+     */
+    public static function sensitiveFields()
+    {
+        return [
+            'email',
+            'real_name',
+            'id_card',
+            'phone',
+            'tel',
+            'birthday',
+            'address',
+            'company',
+            'extra',
+        ];
+    }
+
+    /**
+     * Drop identity fields unless the caller is trusted (valid sign / API token).
+     */
+    public static function stripSensitive(array $profile)
+    {
+        foreach (self::sensitiveFields() as $key) {
+            unset($profile[$key]);
+        }
+        return $profile;
+    }
+
+    /**
+     * Extract profile for visitor entry URLs.
+     * Returns [profile, trusted]. Sensitive fields require valid sign.
+     */
+    public static function extractForVisitorEntry(array $input, $businessId, $visiterId)
+    {
+        $sign = isset($input['sign']) ? (string)$input['sign'] : '';
+        $timestamp = isset($input['timestamp']) ? (string)$input['timestamp'] : '';
+        $trusted = self::verifySign($businessId, $visiterId, $timestamp, $sign);
+        $profile = self::extractFromInput($input);
+        if (!$trusted) {
+            $profile = self::stripSensitive($profile);
+        }
+        return [$profile, $trusted];
+    }
+
     private static function fieldLimits()
     {
         return [
@@ -192,12 +238,29 @@ class AppUserProfile
             }
         }
 
+        $trusted = !empty($meta['trusted']);
+        // Defense in depth: unsigned callers never overwrite existing identity fields
+        if (!$trusted) {
+            foreach (self::sensitiveFields() as $sf) {
+                if ($sf === 'extra') {
+                    continue;
+                }
+                if (!empty($connect[$sf])) {
+                    unset($profile[$sf]);
+                }
+            }
+            unset($profile['extra']);
+        }
+
         $connect = array_merge($connect, $profile);
         $connect['synced_at'] = date('Y-m-d H:i:s');
         $connect['channel'] = 'app';
         if (!empty($meta)) {
             $safeMeta = [];
             foreach ($meta as $mk => $mv) {
+                if ($mk === 'trusted') {
+                    continue;
+                }
                 if (is_scalar($mv)) {
                     $safeMeta[self::clip((string)$mk, 32)] = self::clip((string)$mv, 255);
                 }

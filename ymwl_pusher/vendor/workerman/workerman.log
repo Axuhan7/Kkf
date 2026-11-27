@@ -3742,3 +3742,6 @@ Stack trace:
 2026-11-27 09:31:10 pid:28283 Workerman[start.php] stopping ...
 2026-11-27 09:31:10 pid:28283 Workerman[start.php] has been stopped
 2026-11-27 09:31:10 pid:29067 Workerman[start.php] stop success
+2026-11-27 09:38:17 pid:29272 Workerman[start.php] stop 
+2026-11-27 09:38:17 pid:29272 Workerman[start.php] not run
+2026-11-27 09:38:17 pid:29273 Workerman[start.php] start in DAEMON mode
