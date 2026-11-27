@@ -231,6 +231,10 @@ class Login extends Controller
      */
     public function logout()
     {
+        $login = session('Msg');
+        if (!empty($login['service_id'])) {
+            model('service')->where('service_id', intval($login['service_id']))->update(['state' => 'offline']);
+        }
         Cookie::delete('service_token');
           setCookie("cu_com", "", time() - 60);
           session('Msg',null);

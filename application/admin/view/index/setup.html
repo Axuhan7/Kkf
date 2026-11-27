@@ -339,6 +339,42 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">排队人数提示</label>
+                    <div class="layui-input-block">
+                        <select name="queue_tip_state">
+                            <option value="open" {if !isset($info['queue_tip_state']) || $info['queue_tip_state'] != 'close'}selected{/if}>开启</option>
+                            <option value="close" {if isset($info['queue_tip_state']) && $info['queue_tip_state'] == 'close'}selected{/if}>关闭</option>
+                        </select>
+                        <div style="color: #636c72;">开启后，访客排队时会显示排队人数提示</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排队提示文案</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="queue_tip_text" placeholder="通知 ： 现在还有{num} 人在排队，请等待 ...."
+                               autocomplete="off" class="layui-input" value="{$info['queue_tip_text']|default='通知 ： 现在还有{num} 人在排队，请等待 ....'}">
+                        <div style="color: #636c72;">可用占位符 <code>{num}</code> 表示当前排队人数</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">离线自动回复</label>
+                    <div class="layui-input-block">
+                        <select name="offline_auto_reply">
+                            <option value="open" {if !isset($info['offline_auto_reply']) || $info['offline_auto_reply'] != 'close'}selected{/if}>开启</option>
+                            <option value="close" {if isset($info['offline_auto_reply']) && $info['offline_auto_reply'] == 'close'}selected{/if}>关闭</option>
+                        </select>
+                        <div style="color: #636c72;">客服手动设为离线、或无人在线时，自动向访客回复离线问候语</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">离线问候语</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="offline_greeting" placeholder="您好，客服当前不在线，留言后我们会尽快回复。"
+                               autocomplete="off" class="layui-input" value="{$info['offline_greeting']|default='您好，客服当前不在线，留言后我们会尽快回复。'}">
+                        <div style="color: #636c72;">客服离线时自动发给访客的提示文字</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <div class="layui-input-block" style="padding-top: 5px">
                         <button class="layui-btn keep" lay-submit lay-filter="pusher">保存</button>
                     </div>

@@ -729,6 +729,11 @@
                     <ul class="am-dropdown-content">
                         <li><a href='javascript:showinfo({$data},{$group})'><img src="__image__/admin/B/person.png" alt="">个人资料</a></li>
                         <li><a href='javascript:modify({$arr["service_id"]})' ><img src="__image__/admin/B/change-password.png" alt="">修改密码</a></li>
+                        {if $arr['state'] == 'online'}
+                        <li><a href="javascript:setMyState('offline')"><img src="__image__/admin/B/person.png" alt="">设为离线</a></li>
+                        {else}
+                        <li><a href="javascript:setMyState('online')"><img src="__image__/admin/B/person.png" alt="">设为在线</a></li>
+                        {/if}
                         {if condition="$arr['level'] == 'super_manager' && $referer"}
                         <li><a href="{:url('platform/index/index')}"><img src="__image__/admin/B/back-system.png" alt="">返回系统</a></li>
                         {/if}
@@ -738,6 +743,17 @@
                             </a>
                         </li>
                     </ul>
+<script>
+function setMyState(state) {
+    $.post((typeof YMWL_ROOT_URL !== 'undefined' ? YMWL_ROOT_URL : '') + '/admin/set/setOwnState', {state: state}, function (res) {
+        if (res.code == 0) {
+            layer.msg(res.msg, {icon: 1, time: 800, end: function () { location.reload(); }});
+        } else {
+            layer.msg(res.msg || '操作失败', {icon: 2});
+        }
+    }, 'json');
+}
+</script>
                 </div>
             </li>
         </ul>

@@ -2188,6 +2188,40 @@ EOT
         }
     }
 
+    /**
+     * 客服自行切换在线/离线
+     */
+    public function setOwnState()
+    {
+        $login = session('Msg');
+        if (empty($login) || empty($login['service_id'])) {
+            return json(['code' => 1, 'msg' => '请先登录']);
+        }
+        $state = $this->request->post('state', '');
+        if (!in_array($state, ['online', 'offline'], true)) {
+            return json(['code' => 1, 'msg' => '状态无效']);
+        }
+        $ok = model('service')->where('service_id', intval($login['service_id']))->update(['state' => $state]);
+        if ($ok === false) {
+            return json(['code' => 1, 'msg' => '更新失败']);
+        }
+        $login['state'] = $state;
+        session('Msg', $login);
+        try {
+            $pusher = SinglePusher::getinstance();
+            $pusher->trigger('kefu' . $login['service_id'], 'state-change', [
+                'message' => ['service_id' => $login['service_id'], 'state' => $state]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('setOwnState pusher: ' . $e->getMessage());
+        }
+        return json([
+            'code' => 0,
+            'msg' => $state === 'online' ? '已设为在线' : '已设为离线',
+            'data' => ['state' => $state],
+        ]);
+    }
+
     public function setpushurl()
     {
         $pushurl = $this->request->param('push_url','');
@@ -2196,9 +2230,33 @@ EOT
         $chat_notice1 = $this->request->param('chat_notice1','');
         $chat_notice2 = $this->request->param('chat_notice2','');
         $keyword_block = $this->request->param('keyword_block','');
+        $queue_tip_state = $this->request->param('queue_tip_state', 'open');
+        $queue_tip_text = $this->request->param('queue_tip_text', '');
+        $offline_auto_reply = $this->request->param('offline_auto_reply', 'open');
+        $offline_greeting = $this->request->param('offline_greeting', '');
         // X5 修复：strip_tags 去除 HTML 标签（输出侧模板会做 htmlspecialchars 转义）
         $chat_notice1 = strip_tags($chat_notice1);
         $chat_notice2 = strip_tags($chat_notice2);
+        $queue_tip_text = mb_substr(strip_tags($queue_tip_text), 0, 500, 'UTF-8');
+        $offline_greeting = mb_substr(strip_tags($offline_greeting), 0, 500, 'UTF-8');
+        if (!in_array($queue_tip_state, ['open', 'close'], true)) {
+            $queue_tip_state = 'open';
+        }
+        if (!in_array($offline_auto_reply, ['open', 'close'], true)) {
+            $offline_auto_reply = 'open';
+        }
+        if ($queue_tip_text === '') {
+            $queue_tip_text = '通知 ： 现在还有{num} 人在排队，请等待 ....';
+        }
+        if ($offline_greeting === '') {
+            $offline_greeting = '您好，客服当前不在线，留言后我们会尽快回复。';
+        }
+        $extra = [
+            'queue_tip_state' => $queue_tip_state,
+            'queue_tip_text' => $queue_tip_text,
+            'offline_auto_reply' => $offline_auto_reply,
+            'offline_greeting' => $offline_greeting,
+        ];
         $pattern="#(http|https)://(.*\.)?.*\..*#i";
         $login = session('Msg');
         if(preg_match($pattern,$pushurl)){
@@ -2208,25 +2266,27 @@ EOT
                     'data' => '没有权限',
                 ];
             }
-            $res = model('business')->where('id', $login['business_id'])->update(['push_url' => $pushurl,'domain_entry'=>$domain_entry,'domain_landing'=>$domain_landing,'chat_notice1'=>$chat_notice1,'chat_notice2'=>$chat_notice2,'keyword_block'=>$keyword_block]);
+            $res = model('business')->where('id', $login['business_id'])->update(array_merge(['push_url' => $pushurl,'domain_entry'=>$domain_entry,'domain_landing'=>$domain_landing,'chat_notice1'=>$chat_notice1,'chat_notice2'=>$chat_notice2,'keyword_block'=>$keyword_block], $extra));
             if ($res !== false) {
                 $login['business']['domain_entry']=$domain_entry;
                 $login['business']['domain_landing']=$domain_landing;
                 $login['business']['chat_notice1']=$chat_notice1;
                 $login['business']['chat_notice2']=$chat_notice2;
                 $login['business']['keyword_block']=$keyword_block;
+                $login['business'] = array_merge($login['business'], $extra);
                 session('Msg',$login);
                 return json(['code'=>0,'msg'=>'保存成功']);
             } else {
                 return json(['code'=>1,'msg'=>'保存失败']);
             }
         } elseif(empty($pushurl)){
-         model('business')->where('id', $login['business_id'])->update(['push_url' => $pushurl,'domain_entry'=>$domain_entry,'domain_landing'=>$domain_landing,'chat_notice1'=>$chat_notice1,'chat_notice2'=>$chat_notice2,'keyword_block'=>$keyword_block]);
+         model('business')->where('id', $login['business_id'])->update(array_merge(['push_url' => $pushurl,'domain_entry'=>$domain_entry,'domain_landing'=>$domain_landing,'chat_notice1'=>$chat_notice1,'chat_notice2'=>$chat_notice2,'keyword_block'=>$keyword_block], $extra));
             $login['business']['domain_entry']=$domain_entry;
             $login['business']['domain_landing']=$domain_landing;
             $login['business']['chat_notice1']=$chat_notice1;
             $login['business']['chat_notice2']=$chat_notice2;
             $login['business']['keyword_block']=$keyword_block;
+            $login['business'] = array_merge($login['business'], $extra);
             session('Msg',$login);
             return json(['code'=>0,'msg'=>'修改成功']);
         } else{

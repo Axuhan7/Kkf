@@ -172,6 +172,10 @@ CREATE TABLE `wolive_business` (
   `ai_service_state` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'close' COMMENT 'AI客服开关:open/close',
   `ai_priority` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'human_first' COMMENT '回复优先级:human_first/ai_first',
   `ai_auto_reply_delay` int(11) NULL DEFAULT 0 COMMENT '自动回复延迟(秒)',
+  `queue_tip_state` enum('open','close') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'open' COMMENT '是否向访客显示排队人数提示',
+  `queue_tip_text` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '通知 ： 现在还有{num} 人在排队，请等待 ....' COMMENT '排队提示文案，{num}为排队人数',
+  `offline_auto_reply` enum('open','close') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'open' COMMENT '客服离线时是否自动回复问候语',
+  `offline_greeting` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '您好，客服当前不在线，留言后我们会尽快回复。' COMMENT '离线自动回复问候语',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `bussiness`(`business_name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '商家表';
