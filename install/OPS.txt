@@ -1,0 +1,52 @@
+Kkf 在线客服 — 运维快速清单
+========================
+完整安装：install/安装说明.md
+配置顺序：install/配置顺序.md
+
+【推荐动手顺序】
+  1) 宝塔：Nginx + MySQL 5.7/8.0 + PHP 7.4（不要 PHP 8）
+  2) PHP 扩展；禁用函数只贴安装说明 1.3（勿含 putenv/pcntl_*）；网站根目录=项目/public
+  3) 删 install/install.lock → 打开 /安装.php 或导入 install/data.sql + 写 .env
+  4) 主站开 HTTPS
+  5) 实时通道二选一：
+       方案A：放行 2081 + .env 写 PUSHER_WHOST/WPORT=2081 + 一并写 PUSHER_SSL_CERT/PK
+       方案B：ws 子域名反代 127.0.0.1:2081，WHOST=wss://ws.域名，WPORT=443，不写 SSL_*
+  6) 启动 pusher → Supervisor 守护；改 .env 后必须 restart
+  7) 改密码/品牌；确认 API_ACCESS_TOKEN；装完删除 public/安装.php
+
+0. 宝塔推荐
+   - 扩展以 php -m 为准。最少：curl pdo_mysql mbstring；推送必有 pcntl
+   - 禁用函数：勿含 putenv、pcntl_*
+   - 网站根目录必须：项目/public
+
+1. 配置 .env
+   - 位置：项目根目录（与 application 同级）
+   - 至少：DB_*、APP_DOMAIN、PUSHER_WHOST/WPORT、PUSHER_AHOST/APORT
+   - 方案A 还必须：PUSHER_SSL_CERT、PUSHER_SSL_PK
+   - 密钥留空时自动生成到 runtime/local_secrets.php（勿提交 Git）
+
+2. 数据库
+   - 新装：install/data.sql（utf8mb4）
+   - 演示包：数据库.sql.zip / demo_dump_sanitized.sql（密码 ChangeMe123，立刻改）
+
+3. 实时消息
+   - 诊断：cd ymwl_pusher && /www/server/php/74/bin/php doctor.php
+   - 启动：/www/server/php/74/bin/php start.php start -d
+   - 状态：php start.php status
+   - 重启：php start.php restart
+   - Supervisor 守护开机自启
+   - 2082 建议仅本机
+
+4. 权限
+   - runtime/、public/upload/ 可写（www）
+   - .env 建议 chmod 600
+
+5. App 用户同步
+   - POST /api/user/sync 或访客链接带 email/real_name/...
+   - 鉴权：sign 或头 X-Api-Token（API_ACCESS_TOKEN）
+   - 客服后台「接入方法」有说明
+
+6. 安全
+   - app_debug=false
+   - 装完删除/锁定 安装.php
+   - 定期备份数据库与 upload
