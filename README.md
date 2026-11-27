@@ -10,6 +10,7 @@ ThinkPHP 5.0.24 + Workerman 推送。本仓库已做漏洞加固，详见 [SECUR
 
 - **[install/安装说明.md](install/安装说明.md)** — 环境与细节  
 - **[install/配置顺序.md](install/配置顺序.md)** — 从零到能聊的固定顺序  
+- **[install/备用域名切换.md](install/备用域名切换.md)** — 防屏蔽：备用域名与接入链接全套改法  
 - **[install/OPS.txt](install/OPS.txt)** — 运维速查  
 
 **推荐环境：** Nginx + **MySQL 5.7/8.0** + **PHP 7.4**（不要 PHP 8），网站根目录指向 `public/`。
