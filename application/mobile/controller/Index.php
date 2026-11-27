@@ -275,6 +275,13 @@ hook('mobileindexhook',array_merge($arr,$arr2));
 
         $rest = RestSetting::get(['business_id'=>$business_id]);
         $state = empty($rest) ? false : $rest->isOpen($business_id,$visiter_id) ;
+        if (empty($rest)) {
+            $rest = [
+                'reply' => '',
+                'name_state' => 'close',
+                'tel_state' => 'close',
+            ];
+        }
         session('from_url',null);
         if(!$avatar || !$visiter_name){
             $visiterInfo=Db::name('visiter')->field('visiter_name,avatar')->where(['visiter_id'=>$visiter_id,'business_id'=>$business_id])->find();

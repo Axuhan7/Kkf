@@ -346,6 +346,13 @@ class Index extends Controller
         $business = model('business')->field('*')->where('id', $business_id)->find();
         $rest = RestSetting::get(['business_id'=>$business_id]);
         $state = empty($rest) ? false : $rest->isOpen($business_id,$visiter_id) ;
+        if (empty($rest)) {
+            $rest = [
+                'reply' => '',
+                'name_state' => 'close',
+                'tel_state' => 'close',
+            ];
+        }
         if(!$avatar || !$visiter_name){
             $visiterInfo=Db::name('visiter')->field('visiter_name,avatar')->where(['visiter_id'=>$visiter_id,'business_id'=>$business_id])->find();
             if($visiterInfo){
