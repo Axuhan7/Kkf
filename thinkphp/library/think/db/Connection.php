@@ -293,8 +293,13 @@ abstract class Connection
                     $startTime = microtime(true);
                 }
                 $this->links[$linkNum] = new PDO($config['dsn'], $config['username'], $config['password'], $params);
-                if($config['type']=='mysql'){
-                    $this->links[$linkNum]->exec('SET SQL_MODE="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"');
+                if ($config['type'] == 'mysql') {
+                    // MySQL 8.0 removed NO_AUTO_CREATE_USER; keep a mode that works on 5.7 and 8.0
+                    try {
+                        $this->links[$linkNum]->exec('SET SQL_MODE="NO_ENGINE_SUBSTITUTION"');
+                    } catch (\Throwable $e) {
+                        // ignore sql_mode differences across MySQL versions
+                    }
                 }
                 if ($config['debug']) {
                     // 记录数据库连接信息

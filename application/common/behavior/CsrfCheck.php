@@ -58,6 +58,9 @@ class CsrfCheck
         'mobile/mapp/*',          // 所有手机端APP相关接口
         'admin/upload/*',         // 所有上传相关接口
         'api/push/notify',       // WxPusher 回调接口
+        'api/user/sync',         // App 用户资料同步（用签名 / X-Api-Token）
+        'api/user/*',            // App 用户接口
+        'api/group/*',           // 公开分组接口
     ];
 
     /**
@@ -71,6 +74,8 @@ class CsrfCheck
         'admin/set',          // 客服后台设置/发消息
         'admin/event',        // 聊天事件（上传等）
         'admin/upload',       // 上传
+        'api/user',           // App 用户同步接口
+        'api/group',          // 分组接口
     ];
 
     /**

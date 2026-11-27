@@ -84,6 +84,7 @@ function executeSqlFile($host, $port, $user, $pass, $dbname, $sqlFile) {
         return ['success' => false, 'msg' => '数据库连接失败: ' . mysqli_connect_error()];
     }
     @mysqli_query($conn, "SET NAMES utf8mb4");
+    @mysqli_query($conn, "SET SESSION innodb_strict_mode = 0");
     
     $sql = file_get_contents($sqlFile);
     if (!$sql) {

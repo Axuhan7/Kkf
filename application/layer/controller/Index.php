@@ -200,6 +200,13 @@ class Index extends Controller
         $this->assign('is_bind_wechat', $is_bind_wechat);
         $rest = RestSetting::get(['business_id'=>$business_id]);
         $state = empty($rest) ? false : $rest->isOpen($business_id,$visiter_id) ;
+        if (empty($rest)) {
+            $rest = [
+                'reply' => '',
+                'name_state' => 'close',
+                'tel_state' => 'close',
+            ];
+        }
         $this->assign('reststate', $state);
         $this->assign('restsetting',$rest);
         $this->assign('business_name',$business['business_name']);

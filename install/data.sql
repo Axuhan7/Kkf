@@ -6,6 +6,7 @@
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+SET SESSION innodb_strict_mode = 0;
 
 -- ----------------------------
 -- Table structure for wolive_admin
@@ -23,7 +24,7 @@ CREATE TABLE `wolive_admin`  (
   `expire_time` int(11) NOT NULL DEFAULT 0 COMMENT '账户有效期至，0表示永久',
   `mobile` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '手机号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_admin_ip
@@ -37,7 +38,7 @@ CREATE TABLE `wolive_admin_ip`  (
   `createtime` int(11) NOT NULL DEFAULT 0 COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `ip_address`(`ip_address`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '管理员IP白名单表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '管理员IP白名单表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_admin_token
@@ -49,7 +50,7 @@ CREATE TABLE `wolive_admin_token`  (
   `createtime` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
   `expiretime` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '过期时间',
   PRIMARY KEY (`token`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'Token表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'Token表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_ai_config
@@ -74,7 +75,7 @@ CREATE TABLE `wolive_ai_config`  (
   `updated_at` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `business_id`(`business_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'AI配置表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'AI配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_ai_training
@@ -94,7 +95,7 @@ CREATE TABLE `wolive_ai_training`  (
   `updated_at` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `business_id`(`business_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'AI训练数据表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'AI训练数据表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_ai_chats
@@ -115,7 +116,7 @@ CREATE TABLE `wolive_ai_chats`  (
   INDEX `business_id`(`business_id`) USING BTREE,
   INDEX `visiter_id`(`visiter_id`) USING BTREE,
   INDEX `create_time`(`create_time`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'AI对话记录表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'AI对话记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_attachment_data
@@ -211,7 +212,7 @@ CREATE TABLE `wolive_comment`  (
   `word_comment` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '文字评价',
   `add_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_comment_detail
@@ -223,7 +224,7 @@ CREATE TABLE `wolive_comment_detail`  (
   `title` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `score` tinyint(4) NOT NULL DEFAULT 1 COMMENT '分数',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_comment_setting
@@ -238,7 +239,7 @@ CREATE TABLE `wolive_comment_setting`  (
   `word_title` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `add_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_group
@@ -250,7 +251,7 @@ CREATE TABLE `wolive_group`  (
   `business_id` int(11) UNSIGNED NOT NULL DEFAULT 0,
   `sort` int(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_input
@@ -261,7 +262,7 @@ CREATE TABLE `wolive_input`  (
   `user` varchar(99) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_ip_access_log
@@ -276,7 +277,7 @@ CREATE TABLE `wolive_ip_access_log`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `ip`(`ip`) USING BTREE,
   INDEX `createtime`(`createtime`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'IP访问日志表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = 'IP访问日志表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_login_log
@@ -310,7 +311,7 @@ CREATE TABLE `wolive_message`  (
   PRIMARY KEY (`mid`) USING BTREE,
   INDEX `timestamp`(`timestamp`) USING BTREE,
   INDEX `web`(`business_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_option
@@ -326,7 +327,7 @@ CREATE TABLE `wolive_option`  (
   INDEX `business_id`(`business_id`) USING BTREE,
   INDEX `group`(`group`) USING BTREE,
   INDEX `name`(`title`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_question
@@ -342,7 +343,7 @@ CREATE TABLE `wolive_question`  (
   `answer_read` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `status` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '1显示 0不显示',
   PRIMARY KEY (`qid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '常见问题表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '常见问题表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_queue
@@ -363,7 +364,7 @@ CREATE TABLE `wolive_queue`  (
   INDEX `se`(`service_id`) USING BTREE,
   INDEX `vi`(`visiter_id`) USING BTREE,
   INDEX `business`(`business_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '会话表(排队表)' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '会话表(排队表)' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_reply
@@ -376,7 +377,7 @@ CREATE TABLE `wolive_reply`  (
   `tag` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `sort` int(11) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_report
@@ -409,7 +410,7 @@ CREATE TABLE `wolive_rest_setting`  (
   `tel_state` enum('open','close') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'open',
   `add_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_sentence
@@ -422,7 +423,7 @@ CREATE TABLE `wolive_sentence`  (
   `state` enum('using','unuse') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'unuse' COMMENT 'unuse: 未使用 ，using：使用中',
   PRIMARY KEY (`sid`) USING BTREE,
   INDEX `se`(`service_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_service
@@ -449,7 +450,7 @@ CREATE TABLE `wolive_service`  (
   UNIQUE INDEX `user_name`(`user_name`) USING BTREE,
   INDEX `pid`(`parent_id`) USING BTREE,
   INDEX `web`(`business_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '后台客服表' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '后台客服表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_storage
@@ -462,7 +463,7 @@ CREATE TABLE `wolive_storage`  (
   `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `status` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_tablist
@@ -475,7 +476,7 @@ CREATE TABLE `wolive_tablist`  (
   `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `business_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`tid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_vgroup
@@ -490,7 +491,7 @@ CREATE TABLE `wolive_vgroup`  (
   `status` tinyint(4) NOT NULL DEFAULT 1,
   `bgcolor` char(7) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '#707070',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_visiter
@@ -520,7 +521,7 @@ CREATE TABLE `wolive_visiter`  (
   UNIQUE INDEX `id`(`visiter_id`, `business_id`) USING BTREE,
   INDEX `visiter`(`visiter_id`) USING BTREE,
   INDEX `time`(`timestamp`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_visiter_vgroup
@@ -533,7 +534,7 @@ CREATE TABLE `wolive_visiter_vgroup`  (
   `group_id` int(11) NOT NULL DEFAULT 0,
   `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`vid`, `group_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_wechat_platform
@@ -567,7 +568,7 @@ CREATE TABLE `wolive_wechat_platform`  (
   `is_delete` smallint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `business_id`(`business_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '微信公众号' ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '微信公众号' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wolive_weixin
