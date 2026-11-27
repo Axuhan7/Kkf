@@ -7,14 +7,18 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/Pusher.php';
 require_once __DIR__ . '/config.php';
 
-//WSS证书', '一般为fullchain.pem，宝塔默认位置：/www/server/panel/vhost/cert/kf.otozxgj.com/fullchain.pem'
-$ws_ssl_cert='/www/server/panel/vhost/cert/kf3.yanshi.fun/fullchain.pem';
-//WSS私钥', '一般为privkey.pem，宝塔默认位置：/www/server/panel/vhost/cert/kf.otozxgj.com/privkey.pem'
-$ws_ssl_pk='/www/server/panel/vhost/cert/kf3.yanshi.fun/privkey.pem';
-//&& strpos($whost,'wss://')!==false
-if(trim($ws_ssl_cert) && trim($ws_ssl_pk)){
-    if (!is_file($ws_ssl_cert)) exit("file $ws_ssl_cert not exist\n");
-    if (!is_file($ws_ssl_pk)) exit("file $ws_ssl_pk not exist\n");
+// WSS 证书：优先读 .env 的 PUSHER_SSL_CERT / PUSHER_SSL_PK（方案 A）
+// 宝塔默认路径示例：/www/server/panel/vhost/cert/你的域名/fullchain.pem
+$ws_ssl_cert = trim((string)ymwl_env('PUSHER_SSL_CERT', ''));
+$ws_ssl_pk = trim((string)ymwl_env('PUSHER_SSL_PK', ''));
+
+if ($ws_ssl_cert !== '' && $ws_ssl_pk !== '') {
+    if (!is_file($ws_ssl_cert)) {
+        exit("file $ws_ssl_cert not exist\n");
+    }
+    if (!is_file($ws_ssl_pk)) {
+        exit("file $ws_ssl_pk not exist\n");
+    }
     $context = array(
         'ssl' => array(
             'local_cert'  => $ws_ssl_cert,
@@ -22,12 +26,13 @@ if(trim($ws_ssl_cert) && trim($ws_ssl_pk)){
             'verify_peer' => false,
         )
     );
-}else{
-    $context=[];
+} else {
+    $context = [];
 }
-$pusher = new Pusher\Pusher("websocket://0.0.0.0:$websocket_port",$context);
+
+$pusher = new Pusher\Pusher("websocket://0.0.0.0:$websocket_port", $context);
 $pusher->apiListen = "http://0.0.0.0:$api_port";
-if(trim($ws_ssl_cert) && trim($ws_ssl_pk)){
+if ($ws_ssl_cert !== '' && $ws_ssl_pk !== '') {
     $pusher->transport = 'ssl';
 }
 
@@ -37,7 +42,6 @@ $pusher->appInfo = array(
         'app_secret'   => $app_secret,
     ),
 );
-
 
 // 只能是1
 $pusher->count = 1;
