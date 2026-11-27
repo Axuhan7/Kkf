@@ -352,19 +352,35 @@ var init = function () {
                 service_id =data.service_id;
             }else if(res.code == 1){
                 layer.msg(res.msg,{icon:2});
+                if (res.offline_greeting) {
+                    var og='';
+                    og+='<li class="chatmsg_notice"><div style="position: absolute;left:3px;top:17px">';
+                    og+='<img  class="my-circle" src="'+YMWL_ROOT_URL+'/assets/images/index/workerman_logo.png" ></div>';
+                    og+="<div class='outer-left' style='right:4%;top:13px;'><div class='service'>";
+                    og+="<pre>"+res.offline_greeting+"</pre>";
+                    og+="</div></div></li>";
+                    $(".conversation").append(og);
+                }
             }else if(res.code == 2){
                 $("#img_head").attr("src","/assets/images/index/workerman_logo.png");
                 $("#services").text("");
-                var num= getnums(business_id);
-                // 告知客服在排队
-                var msg='';
-                msg+='<li class="chatmsg_notice"><div style="position: absolute;left:3px;top:17px">';
-                msg+='<img  class="my-circle" src="'+YMWL_ROOT_URL+'/assets/images/index/workerman_logo.png" ></div>';
-                msg+="<div class='outer-left' style='right:4%;top:13px;'><div class='service'>";
-                msg+="<pre>通知 ： 现在还有"+num+" 人在排队，请等待 ....</pre>";
-                msg+="</div></div>";
-                msg+="</li>";
-                $(".conversation").append(msg);
+                var num= (typeof res.data !== 'undefined' && res.data !== null) ? res.data : getnums(business_id);
+                var tipText = '';
+                if (res.queue_tip_show == 1) {
+                    tipText = res.queue_tip_text || ("通知 ： 现在还有"+num+" 人在排队，请等待 ....");
+                } else if (res.offline_greeting) {
+                    tipText = res.offline_greeting;
+                }
+                if (tipText) {
+                    var msg='';
+                    msg+='<li class="chatmsg_notice"><div style="position: absolute;left:3px;top:17px">';
+                    msg+='<img  class="my-circle" src="'+YMWL_ROOT_URL+'/assets/images/index/workerman_logo.png" ></div>';
+                    msg+="<div class='outer-left' style='right:4%;top:13px;'><div class='service'>";
+                    msg+="<pre>"+tipText+"</pre>";
+                    msg+="</div></div>";
+                    msg+="</li>";
+                    $(".conversation").append(msg);
+                }
                  $.cookie("services",'');
             }else if(res.code == 3){
                 layer.msg(res.msg,{icon:2,end:function(){
@@ -375,6 +391,16 @@ var init = function () {
                 var data =res.data;
                 $("#services").text(data.nick_name);
                 $("#img_head").attr('src',data.avatar).addClass("icon_gray");
+                var greeting = res.offline_greeting || (data && data.content) || '';
+                if (greeting) {
+                    var gmsg='';
+                    gmsg+='<li class="chatmsg_notice"><div style="position: absolute;left:3px;top:17px">';
+                    gmsg+='<img  class="my-circle se_pic" src="'+(data.avatar||YMWL_ROOT_URL+'/assets/images/index/workerman_logo.png')+'" ></div>';
+                    gmsg+="<div class='outer-left' style='right:4%;top:13px;'><div class='service'>";
+                    gmsg+="<pre>"+greeting+"</pre>";
+                    gmsg+="</div></div></li>";
+                    $(".conversation").append(gmsg);
+                }
                 layer.open({
                     title:'提示框',
                     area: ['300px', '180px'],

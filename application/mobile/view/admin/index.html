@@ -602,6 +602,15 @@
                                     </li>
 
                                     <li>
+                                        {if condition="$mine['state'] == 'online'"}
+                                        <div class="item flexbox flex-alignc wc__material-cell" onclick="setMyState('offline')">
+                                            <span class="txt">设为离线（当前在线）</span>
+                                        </div>
+                                        {else/}
+                                        <div class="item flexbox flex-alignc wc__material-cell" onclick="setMyState('online')">
+                                            <span class="txt">设为在线（当前离线）</span>
+                                        </div>
+                                        {/if}
                                         <div class="item flexbox flex-alignc wc__material-cell quit" routeUrl="{:url('admin/login/logout',['business_id'=>$seo['id']])}">
                                             <span class="txt">退出</span>
                                         </div>
@@ -1447,6 +1456,16 @@
                 getchat();
             }
         });
+
+        window.setMyState = function(state) {
+            $.post(YMWL_ROOT_URL + '/admin/set/setOwnState', {state: state}, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 800, end: function () { location.reload(); }});
+                } else {
+                    layer.msg(res.msg || '操作失败', {icon: 2});
+                }
+            }, 'json');
+        };
 
     });
 </script>

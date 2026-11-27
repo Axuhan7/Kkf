@@ -100,6 +100,14 @@ class Base extends Controller
         }
 
         $login = session('Msg');
+        // 与库中在线状态同步，避免手动上下线后页头显示不一致
+        if (!empty($login['service_id'])) {
+            $dbState = model('service')->where('service_id', intval($login['service_id']))->value('state');
+            if ($dbState && (!isset($login['state']) || $login['state'] !== $dbState)) {
+                $login['state'] = $dbState;
+                session('Msg', $login);
+            }
+        }
         $res =model('business')->where('id',$login['business_id'])->find();
         if ($res['is_recycle'] || $res['is_delete']) {
             session('Msg',null);

@@ -527,6 +527,8 @@ class Event extends Controller
 
             Db::execute("UPDATE ".config('database.prefix')."queue  SET `lastpost`=:lastpost  WHERE  `visiter_id`=:visiter_id   AND `business_id`=:business_id",['lastpost'=>time(),'visiter_id'=>$arr['visiter_id'],'business_id'=>$arr['business_id']]);
 
+            $this->maybeSendOfflineGreeting($arr, $business, $service_id, $pusher);
+
             $this->processAiAutoReply($arr, $business, $ai_service_state, $ai_priority, $ai_auto_reply_delay, $service_id);
 
             $data = ['code' => 0, 'msg' => 'success','cid' => $chid, 'data' => ['getui' => isset($getui_ret) ? $getui_ret : (isset($getui_e) ? $getui_e : '')]];
@@ -810,7 +812,7 @@ class Event extends Controller
 
                     $pusher->trigger("all" . $arr['business_id'], 'on_notice', array('message' => $allnotice));
 
-                    $returndata = ['code' => 2, 'msg' => '等待认领！', 'data' => $num];
+                    $returndata = $this->appendQueueOfflineTips(['code' => 2, 'msg' => '等待认领！', 'data' => $num], $business, $num);
                     return $returndata;
                 }
 
@@ -850,8 +852,12 @@ class Event extends Controller
                         return $returndata;
 
                     } else {
-
-                        $returndata = ['code' => 4, 'msg' => '该客服暂时离开,请留言！也可以转接其他客服', 'data' => $service_data];
+                        $tips = $this->appendQueueOfflineTips(['code' => 4, 'msg' => '该客服暂时离开,请留言！也可以转接其他客服'], $business, 0);
+                        if (!empty($tips['offline_greeting'])) {
+                            $service_data['content'] = $tips['offline_greeting'];
+                        }
+                        unset($service_data['password']);
+                        $returndata = array_merge($tips, ['data' => $service_data]);
                         return $returndata;
                     }
 
@@ -870,7 +876,7 @@ class Event extends Controller
 
                     $pusher->trigger("all" . $arr['business_id'], 'on_notice', array('message' => $allnotice));
 
-                    $returndata = ['code' => 2, 'msg' => '等待认领！', 'data' => $num];
+                    $returndata = $this->appendQueueOfflineTips(['code' => 2, 'msg' => '等待认领！', 'data' => $num], $business, $num);
                     return $returndata;
                 }
 
@@ -912,7 +918,7 @@ class Event extends Controller
 
                 $pusher->trigger("all" . $arr['business_id'], 'on_notice', array('message' => $allnotice));
 
-                $returndata = ['code' => 2, 'msg' => '等待认领！', 'data' => $num];
+                $returndata = $this->appendQueueOfflineTips(['code' => 2, 'msg' => '等待认领！', 'data' => $num], $business, $num);
                 return $returndata;
             }
         } else {
@@ -938,7 +944,7 @@ class Event extends Controller
                     } else {
                         model('queue')->where('qid', $service['qid'])->update(['state' => 'normal', 'service_id' => 0]);
                     }
-                    $returndata = ['code' => 2, 'msg' => '等待转人工！', 'data' => 0];
+                    $returndata = $this->appendQueueOfflineTips(['code' => 2, 'msg' => '等待转人工！', 'data' => 0], $business, 0);
                     return $returndata;
                 }
                 
@@ -956,7 +962,7 @@ class Event extends Controller
                         $allnotice = ['msg' => "公告:" . $arr['visiter_name'] . "需要" . ($class ? $class['groupname'] : '普通咨询') . "的咨询", 'groupid' => $groupid];
                         $pusher->trigger("all" . $arr['business_id'], 'on_notice', array('message' => $allnotice));
                         
-                        $returndata = ['code' => 2, 'msg' => '等待认领！', 'data' => $num];
+                        $returndata = $this->appendQueueOfflineTips(['code' => 2, 'msg' => '等待认领！', 'data' => $num], $business, $num);
                         return $returndata;
                     }
                 }
@@ -984,6 +990,16 @@ class Event extends Controller
                             return $res;
                         }
                         unset($service_data['password']);
+                    }
+
+                    if (!empty($service_data['state']) && $service_data['state'] == 'offline') {
+                        $tips = $this->appendQueueOfflineTips(['code' => 4, 'msg' => '该客服暂时离开,请留言！也可以转接其他客服'], $business, 0);
+                        if (!empty($tips['offline_greeting'])) {
+                            $service_data['content'] = $tips['offline_greeting'];
+                        }
+                        unset($service_data['open_id']);
+                        unset($service_data['password']);
+                        return array_merge($tips, ['data' => $service_data]);
                     }
                     
                     $data = ['state' => 'normal', 'service_id' => $service_data['service_id'], 'groupid' => $arr['groupid']];
@@ -1017,7 +1033,7 @@ class Event extends Controller
                     }
 
                     if (empty($service_data)) {
-                        $res = ['code' => 1, 'msg' => '该分类客服都不在线', 'data' => $service_data];
+                        $res = $this->appendQueueOfflineTips(['code' => 1, 'msg' => '该分类客服都不在线', 'data' => $service_data], $business, 0);
                         return $res;
                     }
                     $gid = $arr['groupid'];
@@ -1083,7 +1099,7 @@ class Event extends Controller
                     } else {
                         model("queue")->insert($data);
                     }
-                    $returndata = ['code' => 2, 'msg' => '等待转人工！', 'data' => 0];
+                    $returndata = $this->appendQueueOfflineTips(['code' => 2, 'msg' => '等待转人工！', 'data' => 0], $business, 0);
                     return $returndata;
                 }
 
@@ -1103,7 +1119,7 @@ class Event extends Controller
                 }
 
                 if (empty($service_data)) {
-                    $res = ['code' => 1, 'msg' => '该分类客服都不在线', 'data' => $service_data];
+                    $res = $this->appendQueueOfflineTips(['code' => 1, 'msg' => '该分类客服都不在线', 'data' => $service_data], $business, 0);
                     return $res;
                 }
 
@@ -1152,6 +1168,104 @@ class Event extends Controller
             }
         }
     }
+
+    /**
+     * 排队提示 / 离线问候语附加字段
+     */
+    protected function appendQueueOfflineTips(array $ret, $business, $num = null)
+    {
+        if ($num === null) {
+            $num = (isset($ret['data']) && is_numeric($ret['data'])) ? (int)$ret['data'] : 0;
+        } else {
+            $num = (int)$num;
+        }
+        $show = !isset($business['queue_tip_state']) || $business['queue_tip_state'] !== 'close';
+        $tpl = (!empty($business['queue_tip_text']))
+            ? $business['queue_tip_text']
+            : '通知 ： 现在还有{num} 人在排队，请等待 ....';
+        $ret['queue_tip_show'] = $show ? 1 : 0;
+        $ret['queue_tip_text'] = str_replace('{num}', (string)$num, $tpl);
+        $offlineOn = !isset($business['offline_auto_reply']) || $business['offline_auto_reply'] !== 'close';
+        $greeting = (!empty($business['offline_greeting']))
+            ? $business['offline_greeting']
+            : '您好，客服当前不在线，留言后我们会尽快回复。';
+        $ret['offline_auto_reply'] = $offlineOn ? 1 : 0;
+        $ret['offline_greeting'] = $offlineOn ? $greeting : '';
+        return $ret;
+    }
+
+    /**
+     * 客服离线时自动回复问候语（节流 120 秒）
+     */
+    protected function maybeSendOfflineGreeting($arr, $business, $service_id, $pusher)
+    {
+        try {
+            $offlineOn = !isset($business['offline_auto_reply']) || $business['offline_auto_reply'] !== 'close';
+            if (!$offlineOn) {
+                return;
+            }
+            $greeting = (!empty($business['offline_greeting']))
+                ? $business['offline_greeting']
+                : '您好，客服当前不在线，留言后我们会尽快回复。';
+            $greeting = strip_tags($greeting);
+            if ($greeting === '') {
+                return;
+            }
+
+            $need = false;
+            if (empty($service_id)) {
+                $online = model('service')->where(['business_id' => $arr['business_id'], 'state' => 'online'])->count();
+                $need = ($online == 0);
+            } else {
+                $svc = model('service')->where('service_id', $service_id)->find();
+                $need = ($svc && $svc['state'] == 'offline');
+            }
+            if (!$need) {
+                return;
+            }
+
+            $content = htmlspecialchars($greeting);
+            $recent = model('chats')
+                ->where('visiter_id', $arr['visiter_id'])
+                ->where('business_id', $arr['business_id'])
+                ->where('direction', 'to_visiter')
+                ->where('content', $content)
+                ->where('timestamp', '>', time() - 120)
+                ->find();
+            if ($recent) {
+                return;
+            }
+
+            $avatar = '';
+            if (!empty($service_id)) {
+                $svcRow = model('service')->where('service_id', $service_id)->find();
+                if ($svcRow && !empty($svcRow['avatar'])) {
+                    $avatar = $svcRow['avatar'];
+                }
+            }
+            if ($avatar === '') {
+                $avatar = '/assets/images/index/workerman_logo.png';
+            }
+
+            $msg = [
+                'visiter_id' => $arr['visiter_id'],
+                'service_id' => $service_id ? intval($service_id) : 0,
+                'business_id' => $arr['business_id'],
+                'content' => $content,
+                'timestamp' => time(),
+                'direction' => 'to_visiter',
+                'state' => 'unread',
+                'unstr' => '',
+                'avatar' => $avatar,
+            ];
+            model('chats')->insert($msg);
+            $channel = bin2hex($arr['visiter_id'] . '/' . $arr['business_id']);
+            $pusher->trigger('cu' . $channel, 'my-event', ['message' => $msg]);
+        } catch (\Exception $e) {
+            Log::error('maybeSendOfflineGreeting: ' . $e->getMessage());
+        }
+    }
+
     /**
      * 标记已看信息.
      *
