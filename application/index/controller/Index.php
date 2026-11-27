@@ -103,13 +103,18 @@ class Index extends Controller
         }else{
             session('from_url',isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'');
         }
-        // App 访问客服时同步邮箱/实名等资料，供后台访客信息展示
+        // App 访问客服时同步资料；实名/邮箱等敏感字段需有效 sign
         if (!empty($data['visiter_id'])) {
-            $profile = AppUserProfile::extractFromInput($data);
+            list($profile, $trusted) = AppUserProfile::extractForVisitorEntry(
+                $data,
+                $data['business_id'],
+                $data['visiter_id']
+            );
             if (!empty($profile)) {
                 AppUserProfile::sync($data['business_id'], $data['visiter_id'], $profile, [
                     'ip' => $this->request->ip(),
                     'from_url' => 'index/home',
+                    'trusted' => $trusted ? 1 : 0,
                 ]);
             }
         }
@@ -149,11 +154,16 @@ class Index extends Controller
             $this->error('商户ID不存在');
         }
         if (!empty($arr2['visiter_id'])) {
-            $profile = AppUserProfile::extractFromInput($arr2);
+            list($profile, $trusted) = AppUserProfile::extractForVisitorEntry(
+                $arr2,
+                $arr2['business_id'],
+                $arr2['visiter_id']
+            );
             if (!empty($profile)) {
                 AppUserProfile::sync($arr2['business_id'], $arr2['visiter_id'], $profile, [
                     'ip' => $this->request->ip(),
                     'from_url' => 'index/index',
+                    'trusted' => $trusted ? 1 : 0,
                 ]);
             }
         }

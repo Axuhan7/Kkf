@@ -83,6 +83,7 @@ class User extends Base
         $row = AppUserProfile::sync($businessId, $visiterId, $profile, [
             'ip' => $this->request->ip(),
             'from_url' => 'api/user/sync',
+            'trusted' => 1,
         ]);
         if (empty($row)) {
             return json(['code' => 1, 'msg' => '同步失败，请检查参数']);

@@ -51,11 +51,16 @@ class Index extends Controller
 
         $data = $this->request->param();
         if (!empty($data['business_id']) && !empty($data['visiter_id'])) {
-            $profile = AppUserProfile::extractFromInput($data);
+            list($profile, $trusted) = AppUserProfile::extractForVisitorEntry(
+                $data,
+                $data['business_id'],
+                $data['visiter_id']
+            );
             if (!empty($profile)) {
                 AppUserProfile::sync($data['business_id'], $data['visiter_id'], $profile, [
                     'ip' => $this->request->ip(),
                     'from_url' => 'mobile/home',
+                    'trusted' => $trusted ? 1 : 0,
                 ]);
             }
         }
@@ -93,11 +98,16 @@ if(!isset($arr['code'])){
 $code=$arr['code'];
         parse_str($data, $arr2);
         if (!empty($arr2['business_id']) && !empty($arr2['visiter_id'])) {
-            $profile = AppUserProfile::extractFromInput($arr2);
+            list($profile, $trusted) = AppUserProfile::extractForVisitorEntry(
+                $arr2,
+                $arr2['business_id'],
+                $arr2['visiter_id']
+            );
             if (!empty($profile)) {
                 AppUserProfile::sync($arr2['business_id'], $arr2['visiter_id'], $profile, [
                     'ip' => $this->request->ip(),
                     'from_url' => 'mobile/index',
+                    'trusted' => $trusted ? 1 : 0,
                 ]);
             }
         }
